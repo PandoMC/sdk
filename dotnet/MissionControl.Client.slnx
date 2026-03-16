@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/MissionControl.Client.IntegrationTests/MissionControl.Client.IntegrationTests.csproj" Id="88e877c8-f1f5-44b6-9abe-9798e9d2cf02" />
+    <Project Path="tests/MissionControl.Client.UnitTests/MissionControl.Client.UnitTests.csproj" Id="059cea61-efd1-4e99-950c-fec907457607" />
+  </Folder>
   <Project Path="src/MissionControl.Client/MissionControl.Client.csproj" />
 </Solution>
