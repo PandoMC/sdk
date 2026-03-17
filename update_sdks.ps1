@@ -10,9 +10,8 @@ $json = $json -replace "/partnerApi/v2", ""
 $json = $json -replace '("url"\s*:\s*"(https?:\/\/[^"]+))"', '$1/partnerApi/v2"'
 Set-Content -Path $swaggerFile -Value $json -Encoding UTF8
 
-
+# dotnet
 Write-Host "Updating dotnet"
-
 $csharpOutput = "./dotnet/src/MissionControl.Client/Generated"
 kiota generate `
     --openapi $swaggerFile `
@@ -23,12 +22,12 @@ kiota generate `
     --clean-output `
     --namespace-name MissionControl.Client.Generated
 
-# Write-Host "Updating typescript"
-
-# kiota generate `
-#     --openapi $swaggerFile `
-#     --additional-data false `
-#     --language typescript `
-#     --output ./typescript/src/client/generated `
-#     --class-name client `
-#     --namespace-name missioncontrol.client
+# typescript
+Write-Host "Updating typescript"
+kiota generate `
+    --openapi $swaggerFile `
+    --additional-data false `
+    --language typescript `
+    --output ./typescript/src/client/generated `
+    --class-name client `
+    --namespace-name missioncontrol.client
