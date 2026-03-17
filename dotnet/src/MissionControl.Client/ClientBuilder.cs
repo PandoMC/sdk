@@ -35,6 +35,35 @@ public sealed class ClientBuilder
     }
 
     /// <summary>
+    /// Overrides the base URL used for all API requests.
+    /// Useful for pointing at a local development server or a custom endpoint.
+    /// When combined with <see cref="ForEnvironment"/>, the last call wins.
+    /// </summary>
+    /// <param name="baseUrl">The base URL, e.g. <c>http://localhost:5000</c>.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ClientBuilder WithBaseUrl(string baseUrl)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(baseUrl);
+        _baseUrl = baseUrl;
+        return this;
+    }
+
+    /// <summary>
+    /// Overrides the OAuth scope used when acquiring tokens.
+    /// Useful when running against a local or custom environment whose app registration
+    /// differs from the well-known environments.
+    /// When combined with <see cref="ForEnvironment"/>, the last call wins.
+    /// </summary>
+    /// <param name="scope">The full scope URI, e.g. <c>api://&lt;app-id&gt;/.default</c>.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ClientBuilder WithScope(string scope)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(scope);
+        _scope = scope;
+        return this;
+    }
+
+    /// <summary>
     /// Targets a well-known MissionControl environment. Sets the matching base URL and API scope together.
     /// Defaults to <see cref="MissionControlEnvironment.Production"/> when not called.
     /// </summary>
