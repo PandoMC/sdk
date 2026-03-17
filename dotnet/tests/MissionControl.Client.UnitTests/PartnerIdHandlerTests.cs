@@ -27,7 +27,7 @@ public class PartnerIdHandlerTests
         };
         var client = new HttpClient(handler);
 
-        await client.GetAsync("http://localhost/test");
+        await client.GetAsync("http://localhost/test", TestContext.Current.CancellationToken);
 
         Assert.NotNull(captured);
         Assert.True(captured!.Headers.Contains(MissionControlHeaders.PartnerId));
@@ -50,7 +50,7 @@ public class PartnerIdHandlerTests
 
         var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/test");
         request.Headers.TryAddWithoutValidation(MissionControlHeaders.PartnerId, "override-partner");
-        await client.SendAsync(request);
+        await client.SendAsync(request, TestContext.Current.CancellationToken);
 
         Assert.NotNull(captured);
         Assert.Equal("override-partner", captured!.Headers.GetValues(MissionControlHeaders.PartnerId).Single());
