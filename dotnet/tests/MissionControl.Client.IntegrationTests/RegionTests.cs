@@ -7,7 +7,12 @@ public class RegionTests(IntegrationTestFixture fixture) : IClassFixture<Integra
     {
         var client = fixture.GetClient();
 
-        var result = await client.Region.GetAsync(cancellationToken: TestContext.Current.CancellationToken);
+        var result = await client.Region.GetAsync(
+            r =>
+            {
+                r.QueryParameters.PublisherId = fixture.PublisherId;
+            },
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.NotNull(result.Result);

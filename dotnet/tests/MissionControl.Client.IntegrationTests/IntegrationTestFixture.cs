@@ -21,6 +21,7 @@ namespace MissionControl.Client.IntegrationTests;
 ///   MC_SCOPE          – OAuth scope URI, e.g. api://&lt;app-id&gt;/.default
 ///   MC_PRODUCT_ID     – Product GUID used in reservation write tests
 ///   MC_REGION_ID      – Region GUID used in reservation write tests
+///   MC_PUBLISHER_ID   – Publisher GUID used in publisher-scoped tests
 /// </remarks>
 public sealed class IntegrationTestFixture
 {
@@ -34,6 +35,7 @@ public sealed class IntegrationTestFixture
 
     public Guid ProductId { get; }
     public Guid RegionId { get; }
+    public Guid PublisherId { get; }
 
     public IntegrationTestFixture()
     {
@@ -45,6 +47,7 @@ public sealed class IntegrationTestFixture
         var partnerId = Config["MC_PARTNER_ID"];
         var productId = Config["MC_PRODUCT_ID"];
         var regionId = Config["MC_REGION_ID"];
+        var publisherId = Config["MC_PUBLISHER_ID"];
 
         if (string.IsNullOrWhiteSpace(tenantId) ||
             string.IsNullOrWhiteSpace(clientId) ||
@@ -53,16 +56,18 @@ public sealed class IntegrationTestFixture
             string.IsNullOrWhiteSpace(baseUrl) ||
             string.IsNullOrWhiteSpace(scope) ||
             string.IsNullOrWhiteSpace(productId) ||
-            string.IsNullOrWhiteSpace(regionId))
+            string.IsNullOrWhiteSpace(regionId) ||
+            string.IsNullOrWhiteSpace(publisherId))
         {
             _missing =
                 "Integration credentials are not configured. " +
-                "The following secrets are required: MC_TENANT_ID, MC_CLIENT_ID, MC_CLIENT_SECRET, MC_PARTNER_ID, MC_BASE_URL, MC_SCOPE, MC_PRODUCT_ID, MC_REGION_ID.";
+                "The following secrets are required: MC_TENANT_ID, MC_CLIENT_ID, MC_CLIENT_SECRET, MC_PARTNER_ID, MC_BASE_URL, MC_SCOPE, MC_PRODUCT_ID, MC_REGION_ID, MC_PUBLISHER_ID.";
             return;
         }
 
         ProductId = Guid.Parse(productId);
         RegionId = Guid.Parse(regionId);
+        PublisherId = Guid.Parse(publisherId);
 
         _client = new ClientBuilder()
             .WithAzureAdClientCredentials(clientId, clientSecret, tenantId)
