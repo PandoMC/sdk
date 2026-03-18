@@ -135,7 +135,6 @@ export class ClientBuilder {
       httpClient,
     );
     adapter.baseUrl = this._baseUrl;
-
     return createClient(adapter);
   }
 }

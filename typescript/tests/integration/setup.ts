@@ -8,3 +8,15 @@ const envFile = resolve(import.meta.dirname, "../../.env.local");
 if (existsSync(envFile)) {
   process.loadEnvFile(envFile);
 }
+
+// Allow self-signed certificates when running against a local development server.
+// This is scoped to the integration test process and must never be used in production code.
+const baseUrl = process.env["MC_BASE_URL"] ?? "";
+if (
+  baseUrl.startsWith("http://localhost") ||
+  baseUrl.startsWith("https://localhost") ||
+  baseUrl.startsWith("http://127.0.0.1") ||
+  baseUrl.startsWith("https://127.0.0.1")
+) {
+  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+}
