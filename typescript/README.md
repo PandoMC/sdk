@@ -102,6 +102,23 @@ console.log(`Order ${order!.id} placed.`);
 await client.reservation.byReservationId(reservation!.id!).cancel.post();
 ```
 
+### Filtering and pagination
+
+All list endpoints accept an optional `queryParameters` object for filtering and pagination. Every parameter is optional — only set what you need.
+
+**Filter products by publisher, name, and page size:**
+
+```ts
+const result = await client.product.get({
+  queryParameters: {
+    publisherId: ["publisher-id-1", "publisher-id-2"],
+    name: "minecraft",
+    pageSize: 25,
+    pageIndex: 0,
+  },
+});
+```
+
 ## Configuration reference
 
 | Key            | Required | Description                                                 |
