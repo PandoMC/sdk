@@ -3,6 +3,7 @@
 ## SDKs
 
 - [.NET](dotnet/README.md)
+- [.TypeScript](typescript/README.md)
 
 ## How to update the SDKs
 
