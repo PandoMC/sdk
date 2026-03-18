@@ -1,7 +1,5 @@
-import type {
-  Middleware,
-  RequestOption,
-} from "@microsoft/kiota-http-fetchlibrary";
+import type { RequestOption } from "@microsoft/kiota-abstractions";
+import type { Middleware } from "@microsoft/kiota-http-fetchlibrary";
 import { MissionControlHeaders } from "./missionControlHeaders";
 
 /**
