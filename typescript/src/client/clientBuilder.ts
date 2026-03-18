@@ -118,9 +118,13 @@ export class ClientBuilder {
       this._clientId,
       this._clientSecret,
     );
-    const authProvider = new AzureIdentityAuthenticationProvider(credential, [
-      this._scope,
-    ]);
+    const allowedHosts = new Set([new URL(this._baseUrl).host]);
+    const authProvider = new AzureIdentityAuthenticationProvider(
+      credential,
+      [this._scope],
+      undefined,
+      allowedHosts,
+    );
 
     const middlewares = MiddlewareFactory.getDefaultMiddlewares();
     if (this._defaultPartnerId) {
