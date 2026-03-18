@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { ClientBuilder } from "../src/client/clientBuilder.js";
-import { MissionControlEnvironment } from "../src/client/missionControlEnvironment.js";
+import { ClientBuilder } from "../src/client/clientBuilder";
+import { MissionControlEnvironment } from "../src/client/missionControlEnvironment";
 
 describe("ClientBuilder", () => {
   describe("withDefaultPartnerId", () => {

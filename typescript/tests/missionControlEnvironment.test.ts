@@ -3,7 +3,7 @@ import {
   MissionControlEnvironment,
   getBaseUrl,
   getScope,
-} from "../src/client/missionControlEnvironment.js";
+} from "../src/client/missionControlEnvironment";
 
 describe("MissionControlEnvironment", () => {
   describe("enum values", () => {

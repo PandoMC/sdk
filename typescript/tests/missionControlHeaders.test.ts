@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MissionControlHeaders } from "../src/client/missionControlHeaders.js";
+import { MissionControlHeaders } from "../src/client/missionControlHeaders";
 
 describe("MissionControlHeaders", () => {
   it('PartnerId equals "X-Partner-Id"', () => {

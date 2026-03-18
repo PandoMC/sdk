@@ -5,13 +5,13 @@ import {
   KiotaClientFactory,
   MiddlewareFactory,
 } from "@microsoft/kiota-http-fetchlibrary";
-import { createClient, type Client } from "./generated/client.js";
+import { createClient, type Client } from "./generated/client";
 import {
   getBaseUrl,
   getScope,
   MissionControlEnvironment,
-} from "./missionControlEnvironment.js";
-import { PartnerIdHandler } from "./partnerIdHandler.js";
+} from "./missionControlEnvironment";
+import { PartnerIdHandler } from "./partnerIdHandler";
 
 /**
  * Fluent builder for creating a configured {@link Client} instance.

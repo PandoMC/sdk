@@ -2,7 +2,7 @@ import type {
   Middleware,
   RequestOption,
 } from "@microsoft/kiota-http-fetchlibrary";
-import { MissionControlHeaders } from "./missionControlHeaders.js";
+import { MissionControlHeaders } from "./missionControlHeaders";
 
 /**
  * A Kiota middleware that injects a default {@link MissionControlHeaders.PartnerId} header into
