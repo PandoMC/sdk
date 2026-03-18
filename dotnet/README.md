@@ -133,6 +133,22 @@ Console.WriteLine($"Order {order!.Id} placed.");
 await client.Reservation[reservation!.Id!.Value].Cancel.PostAsync();
 ```
 
+### Filtering and pagination
+
+All list endpoints accept an optional query parameter lambda for filtering and pagination. Every parameter is optional — only set what you need.
+
+**Filter products by publisher, name, and page size:**
+
+```csharp
+var result = await client.Product.GetAsync(q =>
+{
+    q.QueryParameters.PublisherId = [publisherId];
+    q.QueryParameters.Name        = "minecraft";
+    q.QueryParameters.PageSize    = 25;
+    q.QueryParameters.PageIndex   = 0;
+});
+```
+
 ## Configuration reference
 
 | Key            | Required | Description                                                 |
