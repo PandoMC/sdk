@@ -18,7 +18,8 @@ describe.skipIf(!!missingCredentials)("PriceList API (integration)", () => {
 
     const result = await client.priceList.get({
       queryParameters: {
-        publisherId: product.publisherId ?? undefined,
+        productId: product.id!,
+        publisherId: product.publisherId!,
       },
     });
 
