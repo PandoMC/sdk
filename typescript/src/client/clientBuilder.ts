@@ -3,6 +3,7 @@ import { AzureIdentityAuthenticationProvider } from "@microsoft/kiota-authentica
 import {
   FetchRequestAdapter,
   KiotaClientFactory,
+  MiddlewareFactory,
 } from "@microsoft/kiota-http-fetchlibrary";
 import { createClient, type Client } from "./generated/client.js";
 import {
@@ -121,7 +122,7 @@ export class ClientBuilder {
       this._scope,
     ]);
 
-    const middlewares = KiotaClientFactory.getDefaultMiddlewares();
+    const middlewares = MiddlewareFactory.getDefaultMiddlewares();
     if (this._defaultPartnerId) {
       middlewares.unshift(new PartnerIdHandler(this._defaultPartnerId));
     }
