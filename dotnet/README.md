@@ -12,7 +12,7 @@ The .NET SDK for the [Mission:Control](https://www.missioncontrol.io) Partner AP
 dotnet add package MissionControl.Client
 ```
 
-## Getting started quickly
+## Getting started
 
 ### Creating a client
 
