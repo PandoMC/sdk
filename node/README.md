@@ -139,3 +139,88 @@ const result = await client.product.get({
 | `withBaseUrl(url)`                                                | Override the base URL (e.g. for local development) |
 | `withScope(scope)`                                                | Override the OAuth scope                           |
 | `build()`                                                         | Return the configured `Client` instance            |
+
+## Resilience
+
+The SDK registers Kiota's default HTTP middleware pipeline, which includes a `RetryHandler` that automatically retries transient failures before surfacing an exception:
+
+| Status code | Meaning             | Behaviour                             |
+| ----------- | ------------------- | ------------------------------------- |
+| `429`       | Too Many Requests   | Retried after honouring `Retry-After` |
+| `503`       | Service Unavailable | Retried with exponential back-off     |
+| `504`       | Gateway Timeout     | Retried with exponential back-off     |
+
+The handler retries up to three times by default. If all retries are exhausted without a successful response the last error response is returned to the caller (and mapped to a `ProblemDetails` error where applicable).
+
+No extra configuration is required — retries are active out of the box.
+
+## Error handling
+
+The API returns errors as [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457) JSON objects. The SDK maps these to `ProblemDetails` objects and throws them, which you catch like any other error.
+
+### `ProblemDetails` properties
+
+| Property         | Type                      | Description                                                     |
+| ---------------- | ------------------------- | --------------------------------------------------------------- |
+| `status`         | `number \| null`          | HTTP status code (e.g. `400`, `500`)                            |
+| `title`          | `string \| null`          | Short, human-readable summary of the problem                    |
+| `detail`         | `string \| null`          | Longer explanation of this specific occurrence                  |
+| `type`           | `string \| null`          | URI identifying the problem type                                |
+| `instance`       | `string \| null`          | URI identifying this specific occurrence                        |
+| `additionalData` | `Record<string, unknown>` | Any extra fields returned by the API (e.g. `errors`, `traceId`) |
+
+### Status codes
+
+| Status | When it occurs                                                                                      |
+| ------ | --------------------------------------------------------------------------------------------------- |
+| `400`  | The request failed validation — check `additionalData["errors"]` for per-field messages             |
+| `500`  | An unexpected error occurred on the server — `additionalData["traceId"]` can be shared with support |
+
+### Handling a validation error (400)
+
+A 400 response from the API looks like:
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "ProductId": ["The value 'foobar' is not valid."]
+  },
+  "traceId": "00-90f2dadbc2e77ae87cbe3b8a25fe0689-dbff6f5f82d028d2-00"
+}
+```
+
+`errors` and `traceId` are not first-class properties on the model — they land in `additionalData` because they are not part of the OpenAPI schema. Cast them as needed:
+
+```ts
+import type { ProblemDetails } from "@pandomc/missioncontrol-client";
+
+try {
+  const result = await client.product.get({
+    queryParameters: {
+      productId: ["not-a-guid"],
+    },
+  });
+} catch (ex) {
+  if (ex && typeof ex === "object" && "status" in ex) {
+    const problem = ex as ProblemDetails;
+    console.log(`Failed: ${problem.title}`);
+
+    const errors = problem.additionalData?.["errors"];
+    if (errors && typeof errors === "object") {
+      for (const [field, messages] of Object.entries(
+        errors as Record<string, unknown>,
+      )) {
+        console.log(`  ${field}: ${messages}`);
+      }
+    }
+
+    const traceId = problem.additionalData?.["traceId"];
+    if (traceId !== undefined) {
+      console.log(`  Trace ID: ${traceId}`);
+    }
+  }
+}
+```
