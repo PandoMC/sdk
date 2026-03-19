@@ -1,6 +1,6 @@
-# MissionControl Client — TypeScript SDK
+# MissionControl Client — Node SDK
 
-The TypeScript SDK for the [Mission:Control](https://www.missioncontrol.io) Partner API. Built on top of [Kiota](https://learn.microsoft.com/en-us/openapi/kiota/), it provides a strongly-typed, async client for all partner operations: listing products, managing reservations, and creating orders.
+The Node SDK for the [Mission:Control](https://www.missioncontrol.io) Partner API. Built on top of [Kiota](https://learn.microsoft.com/en-us/openapi/kiota/), it provides a strongly-typed, async client for all partner operations: listing products, managing reservations, and creating orders.
 
 ## Requirements
 
