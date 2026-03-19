@@ -15,7 +15,6 @@ Write-Host "Updating dotnet"
 $csharpOutput = "./dotnet/src/MissionControl.Client/Generated"
 kiota generate `
     --openapi $swaggerFile `
-    --additional-data false `
     --language csharp `
     --output $csharpOutput `
     --class-name Client `
@@ -26,7 +25,6 @@ kiota generate `
 Write-Host "Updating node"
 kiota generate `
     --openapi $swaggerFile `
-    --additional-data false `
     --language typescript `
     --output ./node/src/client/generated `
     --class-name client `
