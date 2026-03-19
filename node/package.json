@@ -1,7 +1,6 @@
 {
-  "name": "@missioncontrol/client",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@missioncontrolio/client",
+  "description": "The official Node SDK for the Mission:Control Partner API.",
   "license": "ISC",
   "author": "",
   "type": "module",
