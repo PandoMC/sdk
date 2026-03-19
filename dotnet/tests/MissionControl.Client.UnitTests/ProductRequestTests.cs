@@ -97,4 +97,47 @@ public class ProductRequestTests
         Assert.Contains("pageSize=10", uri);
         Assert.Contains("pageIndex=0", uri);
     }
+
+    [Fact]
+    public async Task GetAsync_ThrowsProblemDetails_WhenApiReturnsValidationError()
+    {
+        // Arrange
+        var adapter = new Mock<IRequestAdapter>();
+        adapter.SetupProperty(a => a.BaseUrl, "https://localhost");
+        var client = new MissionControlClient(adapter.Object);
+
+        var validationError = new ProblemDetails
+        {
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+            Title = "One or more validation errors occurred.",
+            Status = 400,
+            AdditionalData = new Dictionary<string, object>
+            {
+                ["errors"] = new Dictionary<string, string[]>
+                {
+                    ["ProductId"] = ["The value 'foobar' is not valid."]
+                },
+                ["traceId"] = "00-90f2dadbc2e77ae87cbe3b8a25fe0689-dbff6f5f82d028d2-00",
+            },
+        };
+
+        adapter.Setup(a => a.SendAsync(
+                It.IsAny<RequestInformation>(),
+                ProductListResult.CreateFromDiscriminatorValue,
+                It.IsAny<Dictionary<string, ParsableFactory<IParsable>>>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(validationError);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ProblemDetails>(() =>
+            client.Product.GetAsync(cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Equal(400, ex.Status);
+        Assert.Equal("One or more validation errors occurred.", ex.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", ex.Type);
+
+        var errors = Assert.IsType<Dictionary<string, string[]>>(ex.AdditionalData["errors"]);
+        Assert.Equal(["The value 'foobar' is not valid."], errors["ProductId"]);
+        Assert.Equal("00-90f2dadbc2e77ae87cbe3b8a25fe0689-dbff6f5f82d028d2-00", ex.AdditionalData["traceId"]);
+    }
 }
