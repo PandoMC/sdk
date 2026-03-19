@@ -1,6 +1,8 @@
 using Azure.Identity;
 using Microsoft.Kiota.Authentication.Azure;
 using Microsoft.Kiota.Http.HttpClientLibrary;
+using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
+using System.Net;
 
 namespace MissionControl.Client;
 
@@ -115,12 +117,7 @@ public sealed class ClientBuilder
         var credential = new ClientSecretCredential(_tenantId, _clientId, _clientSecret);
         var authProvider = new AzureIdentityAuthenticationProvider(credential, scopes: _scope);
 
-        var handlers = KiotaClientFactory.CreateDefaultHandlers();
-        if (_defaultPartnerId is not null)
-        {
-            handlers.Insert(0, new PartnerIdHandler(_defaultPartnerId));
-        }
-
+        var handlers = CreateHandlers(_defaultPartnerId);
         var httpClient = KiotaClientFactory.Create(handlers);
 
         var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient)
@@ -129,6 +126,55 @@ public sealed class ClientBuilder
         };
 
         return new Generated.Client(adapter);
+    }
+
+    /// <summary>
+    /// Endpoints that must never be retried because they are not idempotent.
+    /// A retry could cause duplicate orders, reservations, or cancellations.
+    /// </summary>
+    private static readonly HashSet<string> _noRetryPaths = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "/Order/createOrder",
+        "/Order/claimReservation",
+        "/Order/reportOrder",
+    };
+
+    private static bool IsNoRetryEndpoint(HttpResponseMessage response)
+    {
+        var path = response.RequestMessage?.RequestUri?.AbsolutePath;
+        if (path is null)
+            return false;
+
+        // Exact match for fixed paths, or prefix match for parameterised ones
+        // (e.g. /Reservation/{id}/cancel).
+        return _noRetryPaths.Any(noRetryPath => path.StartsWith(noRetryPath, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static List<DelegatingHandler> CreateHandlers(string? defaultPartnerId)
+    {
+        var retryOptions = new RetryHandlerOption
+        {
+            ShouldRetry = (_, _, response) =>
+            {
+                if (IsNoRetryEndpoint(response))
+                    return false;
+
+                return response.StatusCode switch
+                {
+                    HttpStatusCode.ServiceUnavailable => true,
+                    HttpStatusCode.GatewayTimeout => true,
+                    HttpStatusCode.TooManyRequests => true,
+                    _ => false
+                };
+            }
+        };
+
+        var handlers = KiotaClientFactory.CreateDefaultHandlers([retryOptions]).ToList();
+
+        if (defaultPartnerId is not null)
+            handlers.Insert(0, new PartnerIdHandler(defaultPartnerId));
+
+        return handlers;
     }
 
     // Stored until Build() so ForEnvironment() called after WithAzureAdClientCredentials()
