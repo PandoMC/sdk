@@ -1,0 +1,28 @@
+name: .NET SDK
+
+on:
+  pull_request:
+    paths:
+      - "dotnet/**"
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Restore
+        run: dotnet restore dotnet/MissionControl.Client.slnx
+
+      - name: Build
+        run: dotnet build dotnet/MissionControl.Client.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test dotnet/tests/MissionControl.Client.UnitTests/MissionControl.Client.UnitTests.csproj --no-build --configuration Release --verbosity normal

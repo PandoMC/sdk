@@ -1,0 +1,48 @@
+name: .NET SDK – Publish
+
+on:
+  push:
+    tags:
+      - "dotnet/v*"
+
+jobs:
+  publish:
+    name: Pack & Push to NuGet
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#dotnet/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore dotnet/MissionControl.Client.slnx
+
+      - name: Build
+        run: dotnet build dotnet/MissionControl.Client.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test dotnet/tests/MissionControl.Client.UnitTests/MissionControl.Client.UnitTests.csproj --no-build --configuration Release --verbosity normal
+
+      - name: Pack
+        run: >
+          dotnet pack
+          dotnet/src/MissionControl.Client/MissionControl.Client.csproj
+          --no-build
+          --configuration Release
+          -p:Version=${{ steps.version.outputs.VERSION }}
+          --output ./artifacts
+
+      - name: Push to NuGet
+        run: >
+          dotnet nuget push ./artifacts/*.nupkg
+          --api-key ${{ secrets.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
