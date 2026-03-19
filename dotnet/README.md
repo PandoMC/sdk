@@ -169,3 +169,83 @@ var result = await client.Product.GetAsync(q =>
 | `WithBaseUrl(url)`                                                | Override the base URL (e.g. for local development) |
 | `WithScope(scope)`                                                | Override the OAuth scope                           |
 | `Build()`                                                         | Return the configured `Client` instance            |
+
+## Resilience
+
+The SDK registers Kiota's default HTTP middleware pipeline, which includes a `RetryHandler` that automatically retries transient failures before surfacing an exception:
+
+| Status code | Meaning             | Behaviour                             |
+| ----------- | ------------------- | ------------------------------------- |
+| `429`       | Too Many Requests   | Retried after honouring `Retry-After` |
+| `503`       | Service Unavailable | Retried with exponential back-off     |
+| `504`       | Gateway Timeout     | Retried with exponential back-off     |
+
+The handler retries up to three times by default. If all retries are exhausted without a successful response the last error response is returned to the caller (and mapped to a `ProblemDetails` exception where applicable).
+
+No extra configuration is required — retries are active out of the box.
+
+## Error handling
+
+The API returns errors as [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457) JSON objects. The SDK maps these to `ProblemDetails` exceptions, which you catch like any other exception.
+
+### `ProblemDetails` properties
+
+| Property         | Type                         | Description                                                     |
+| ---------------- | ---------------------------- | --------------------------------------------------------------- |
+| `Status`         | `int?`                       | HTTP status code (e.g. `400`, `500`)                            |
+| `Title`          | `string?`                    | Short, human-readable summary of the problem                    |
+| `Detail`         | `string?`                    | Longer explanation of this specific occurrence                  |
+| `Type`           | `string?`                    | URI identifying the problem type                                |
+| `Instance`       | `string?`                    | URI identifying this specific occurrence                        |
+| `AdditionalData` | `IDictionary<string,object>` | Any extra fields returned by the API (e.g. `errors`, `traceId`) |
+
+### Status codes
+
+| Status | When it occurs                                                                                      |
+| ------ | --------------------------------------------------------------------------------------------------- |
+| `400`  | The request failed validation — check `AdditionalData["errors"]` for per-field messages             |
+| `500`  | An unexpected error occurred on the server — `AdditionalData["traceId"]` can be shared with support |
+
+### Handling a validation error (400)
+
+A 400 response from the API looks like:
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "ProductId": ["The value 'foobar' is not valid."]
+  },
+  "traceId": "00-90f2dadbc2e77ae87cbe3b8a25fe0689-dbff6f5f82d028d2-00"
+}
+```
+
+`errors` and `traceId` are not first-class properties on the model — they land in `AdditionalData` because they are not part of the OpenAPI schema. Cast them as needed:
+
+```csharp
+using MissionControl.Client.Generated.Models;
+
+try
+{
+    var result = await client.Product.GetAsync(q =>
+    {
+        q.QueryParameters.ProductId = [Guid.Parse("not-a-guid")];
+    });
+}
+catch (ProblemDetails ex)
+{
+    Console.WriteLine($"Failed: {ex.Title}");
+
+    if (ex.AdditionalData.TryGetValue("errors", out var raw) &&
+        raw is Dictionary<string, object> errors)
+    {
+        foreach (var (field, messages) in errors)
+            Console.WriteLine($"  {field}: {messages}");
+    }
+
+    if (ex.AdditionalData.TryGetValue("traceId", out var traceId))
+        Console.WriteLine($"  Trace ID: {traceId}");
+}
+```

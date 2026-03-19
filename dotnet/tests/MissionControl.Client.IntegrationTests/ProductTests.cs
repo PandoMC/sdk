@@ -30,7 +30,7 @@ public class ProductTests(IntegrationTestFixture fixture) : IClassFixture<Integr
         var response = await client.Product.HasStock.PostAsync(new HasStockRequest
         {
             ProductId = product.Id,
-            RegionId  = product.AllowedRegions![0],
+            RegionId = product.AllowedRegions![0],
         }, cancellationToken: ct);
 
         Assert.NotNull(response);
@@ -38,4 +38,3 @@ public class ProductTests(IntegrationTestFixture fixture) : IClassFixture<Integr
         Assert.NotNull(response.HasStock);
     }
 }
-
