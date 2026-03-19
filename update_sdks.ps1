@@ -22,12 +22,12 @@ kiota generate `
     --clean-output `
     --namespace-name MissionControl.Client.Generated
 
-# typescript
-Write-Host "Updating typescript"
+# node
+Write-Host "Updating node"
 kiota generate `
     --openapi $swaggerFile `
     --additional-data false `
     --language typescript `
-    --output ./typescript/src/client/generated `
+    --output ./node/src/client/generated `
     --class-name client `
     --namespace-name missioncontrol.client
