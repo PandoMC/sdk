@@ -174,6 +174,12 @@ public sealed class ClientBuilder
         if (defaultPartnerId is not null)
             handlers.Insert(0, new PartnerIdHandler(defaultPartnerId));
 
+        // AutoCancelHandler sits at the outermost position so it sees the final response
+        // after all retries are exhausted. Its compensating cancel request flows through the
+        // inner handlers (PartnerIdHandler, RetryHandler, etc.) and therefore picks up
+        // authentication, partner-id injection, and retry behaviour automatically.
+        handlers.Insert(0, new AutoCancelOrderHandler());
+
         return handlers;
     }
 
