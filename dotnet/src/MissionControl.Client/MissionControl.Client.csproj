@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
 
     <!-- NuGet package metadata — version is injected by CI via -p:Version=x.y.z -->
-    <PackageId>PandoMC.MissionControl.Client</PackageId>
-    <Authors>PandoMC</Authors>
+    <PackageId>MissionControl.Client</PackageId>
+    <Authors>MissionControl</Authors>
     <Description>The official .NET SDK for the Mission:Control Partner API.</Description>
     <PackageProjectUrl>https://github.com/PandoMC/sdk</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PandoMC/sdk</RepositoryUrl>
