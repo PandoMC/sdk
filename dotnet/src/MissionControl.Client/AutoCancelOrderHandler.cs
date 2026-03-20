@@ -22,12 +22,6 @@ internal sealed class AutoCancelOrderHandler : DelegatingHandler
     /// </summary>
     private static readonly TimeSpan CancelTimeout = TimeSpan.FromSeconds(30);
 
-    private static readonly string[] AutoCancelPathPrefixes =
-    [
-        "/Order/createOrder",
-        "/Order/claimReservation",
-        "/Order/reportOrder",
-    ];
 
     /// <inheritdoc/>
     protected override async Task<HttpResponseMessage> SendAsync(
@@ -71,7 +65,7 @@ internal sealed class AutoCancelOrderHandler : DelegatingHandler
 
         // Use Contains so this works regardless of any base-path prefix
         // (e.g. /partnerApi/v2/Order/createOrder).
-        foreach (var segment in AutoCancelPathPrefixes)
+        foreach (var segment in NonIdempotentPaths.All)
         {
             if (path.Contains(segment, StringComparison.OrdinalIgnoreCase))
                 return true;

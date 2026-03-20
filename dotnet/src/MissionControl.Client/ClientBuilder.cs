@@ -1,8 +1,6 @@
 using Azure.Identity;
 using Microsoft.Kiota.Authentication.Azure;
 using Microsoft.Kiota.Http.HttpClientLibrary;
-using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
-using System.Net;
 
 namespace MissionControl.Client;
 
@@ -21,7 +19,7 @@ public sealed class ClientBuilder
     /// <para>
     /// Most partners operate under a single partner identity, so setting this once on the
     /// builder means you never have to specify it per-request. When a request explicitly sets
-    /// the header (via <c>q.Headers.Add("X-Partner-Id", "…")</c>) that value takes precedence
+    /// the header (via <c>q.Headers.Add("X-Partner-Id", "ï¿½")</c>) that value takes precedence
     /// over the default configured here.
     /// </para>
     /// </summary>
@@ -117,7 +115,7 @@ public sealed class ClientBuilder
         var credential = new ClientSecretCredential(_tenantId, _clientId, _clientSecret);
         var authProvider = new AzureIdentityAuthenticationProvider(credential, scopes: _scope);
 
-        var handlers = CreateHandlers(_defaultPartnerId);
+        var handlers = MissionControlHandlers.Create(_defaultPartnerId);
         var httpClient = KiotaClientFactory.Create(handlers);
 
         var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient)
@@ -126,61 +124,6 @@ public sealed class ClientBuilder
         };
 
         return new Generated.Client(adapter);
-    }
-
-    /// <summary>
-    /// Endpoints that must never be retried because they are not idempotent.
-    /// A retry could cause duplicate orders, reservations, or cancellations.
-    /// </summary>
-    private static readonly HashSet<string> _noRetryPaths = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "/Order/createOrder",
-        "/Order/claimReservation",
-        "/Order/reportOrder",
-    };
-
-    private static bool IsNoRetryEndpoint(HttpResponseMessage response)
-    {
-        var path = response.RequestMessage?.RequestUri?.AbsolutePath;
-        if (path is null)
-            return false;
-
-        // Exact match for fixed paths, or prefix match for parameterised ones
-        // (e.g. /Reservation/{id}/cancel).
-        return _noRetryPaths.Any(noRetryPath => path.StartsWith(noRetryPath, StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static List<DelegatingHandler> CreateHandlers(string? defaultPartnerId)
-    {
-        var retryOptions = new RetryHandlerOption
-        {
-            ShouldRetry = (_, _, response) =>
-            {
-                if (IsNoRetryEndpoint(response))
-                    return false;
-
-                return response.StatusCode switch
-                {
-                    HttpStatusCode.ServiceUnavailable => true,
-                    HttpStatusCode.GatewayTimeout => true,
-                    HttpStatusCode.TooManyRequests => true,
-                    _ => false
-                };
-            }
-        };
-
-        var handlers = KiotaClientFactory.CreateDefaultHandlers([retryOptions]).ToList();
-
-        if (defaultPartnerId is not null)
-            handlers.Insert(0, new PartnerIdHandler(defaultPartnerId));
-
-        // AutoCancelHandler sits at the outermost position so it sees the final response
-        // after all retries are exhausted. Its compensating cancel request flows through the
-        // inner handlers (PartnerIdHandler, RetryHandler, etc.) and therefore picks up
-        // authentication, partner-id injection, and retry behaviour automatically.
-        handlers.Insert(0, new AutoCancelOrderHandler());
-
-        return handlers;
     }
 
     // Stored until Build() so ForEnvironment() called after WithAzureAdClientCredentials()
