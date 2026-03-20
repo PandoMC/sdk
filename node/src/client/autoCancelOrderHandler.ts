@@ -1,12 +1,7 @@
 import type { RequestOption } from "@microsoft/kiota-abstractions";
 import type { Middleware } from "@microsoft/kiota-http-fetchlibrary";
 import { MissionControlHeaders } from "./missionControlHeaders";
-
-const AUTO_CANCEL_PATH_PREFIXES = [
-  "/Order/createOrder",
-  "/Order/claimReservation",
-  "/Order/reportOrder",
-] as const;
+import { nonIdempotentPaths } from "./nonIdempotentPaths";
 
 const CANCEL_TIMEOUT_MS = 30_000;
 
@@ -91,7 +86,9 @@ export class AutoCancelOrderHandler implements Middleware {
 function isAutoCancelEndpoint(url: string): boolean {
   try {
     const path = new URL(url).pathname;
-    return AUTO_CANCEL_PATH_PREFIXES.some((prefix) =>
+    // Use includes so this works regardless of any base-path prefix
+    // (e.g. /partnerApi/v2/Order/createOrder).
+    return nonIdempotentPaths.some((prefix) =>
       path.toLowerCase().includes(prefix.toLowerCase()),
     );
   } catch {
