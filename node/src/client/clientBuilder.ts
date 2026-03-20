@@ -11,6 +11,7 @@ import {
   getScope,
   MissionControlEnvironment,
 } from "./missionControlEnvironment";
+import { AutoCancelOrderHandler } from "./autoCancelOrderHandler";
 import { PartnerIdHandler } from "./partnerIdHandler";
 
 /**
@@ -130,6 +131,10 @@ export class ClientBuilder {
     if (this._defaultPartnerId) {
       middlewares.unshift(new PartnerIdHandler(this._defaultPartnerId));
     }
+    // AutoCancelOrderHandler sits at the outermost position so it sees the final response
+    // after all retries are exhausted. Its compensating cancel request flows through the
+    // inner handlers and therefore picks up partner-id injection and retry behaviour.
+    middlewares.unshift(new AutoCancelOrderHandler());
 
     const httpClient = KiotaClientFactory.create(undefined, middlewares);
     const adapter = new FetchRequestAdapter(
