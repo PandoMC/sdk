@@ -7,6 +7,9 @@ on:
 
 jobs:
   publish:
+    permissions:
+      id-token: write # Required for publishing to Nuget using Trusted Publishers.
+
     name: Pack & Push to NuGet
     runs-on: ubuntu-latest
     defaults:
@@ -43,9 +46,16 @@ jobs:
           -p:Version=${{ steps.version.outputs.VERSION }}
           --output ./artifacts
 
+      # Get a short-lived NuGet API key
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: MissionControl # Recommended: use a secret like ${{ secrets.NUGET_USER }} for your nuget.org username (profile name), NOT your email address
+
       - name: Push to NuGet
         run: >
           dotnet nuget push ./artifacts/*.nupkg
-          --api-key ${{ secrets.NUGET_API_KEY }}
+          --api-key ${{steps.login.outputs.NUGET_API_KEY}}
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
