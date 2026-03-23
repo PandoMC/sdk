@@ -9,7 +9,7 @@ Node.js 18 or later
 ## Installation
 
 ```
-npm install @pandomc/missioncontrol-client
+npm install @missioncontrolio/client
 ```
 
 ## Getting started
@@ -19,7 +19,7 @@ npm install @pandomc/missioncontrol-client
 Credentials are obtained from the **Client Credentials** page in the Mission:Control portal.
 
 ```ts
-import { ClientBuilder } from "@pandomc/missioncontrol-client";
+import { ClientBuilder } from "@missioncontrolio/client";
 
 const client = new ClientBuilder()
   .withAzureAdClientCredentials("your-client-id", "your-client-secret")
@@ -33,7 +33,7 @@ By default the client targets **Production**. To use the **Sandbox** environment
 import {
   ClientBuilder,
   MissionControlEnvironment,
-} from "@pandomc/missioncontrol-client";
+} from "@missioncontrolio/client";
 
 const client = new ClientBuilder()
   .forEnvironment(MissionControlEnvironment.Sandbox)
@@ -195,7 +195,7 @@ A 400 response from the API looks like:
 `errors` and `traceId` are not first-class properties on the model — they land in `additionalData` because they are not part of the OpenAPI schema. Cast them as needed:
 
 ```ts
-import type { ProblemDetails } from "@pandomc/missioncontrol-client";
+import type { ProblemDetails } from "@missioncontrolio/client";
 
 try {
   const result = await client.product.get({
