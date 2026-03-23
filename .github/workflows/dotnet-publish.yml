@@ -9,6 +9,9 @@ jobs:
   publish:
     name: Pack & Push to NuGet
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dotnet
 
     steps:
       - uses: actions/checkout@v4
@@ -23,18 +26,18 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#dotnet/v}" >> "$GITHUB_OUTPUT"
 
       - name: Restore
-        run: dotnet restore dotnet/MissionControl.Client.slnx
+        run: dotnet restore MissionControl.Client.slnx
 
       - name: Build
-        run: dotnet build dotnet/MissionControl.Client.slnx --no-restore --configuration Release
+        run: dotnet build MissionControl.Client.slnx --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test dotnet/tests/MissionControl.Client.UnitTests/MissionControl.Client.UnitTests.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test tests/MissionControl.Client.UnitTests/MissionControl.Client.UnitTests.csproj --no-build --configuration Release --verbosity normal
 
       - name: Pack
         run: >
           dotnet pack
-          dotnet/src/MissionControl.Client/MissionControl.Client.csproj
+          src/MissionControl.Client/MissionControl.Client.csproj
           --no-build
           --configuration Release
           -p:Version=${{ steps.version.outputs.VERSION }}
