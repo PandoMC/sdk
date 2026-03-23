@@ -5,10 +5,17 @@ on:
     tags:
       - "node/v*"
 
+permissions:
+  id-token: write # Required for publishing to NPM using Trusted Publishers.
+  contents: read
+
 jobs:
   publish:
     name: Build & Publish to npm
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: node
 
     steps:
       - uses: actions/checkout@v4
@@ -27,22 +34,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: node
 
       - name: Build
         run: npm run build
-        working-directory: node
 
       - name: Test
         run: npm test
-        working-directory: node
 
       - name: Set package version
         run: npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
-        working-directory: node
 
       - name: Publish to npm
         run: npm publish --access public
-        working-directory: node
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
