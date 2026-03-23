@@ -3,6 +3,7 @@
   "description": "The official Node SDK for the Mission:Control Partner API.",
   "license": "ISC",
   "author": "",
+  "repository": "github:PandoMC/sdk",
   "type": "module",
   "main": "index.js",
   "scripts": {
