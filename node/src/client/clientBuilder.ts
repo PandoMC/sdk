@@ -3,7 +3,6 @@ import { AzureIdentityAuthenticationProvider } from "@microsoft/kiota-authentica
 import {
   FetchRequestAdapter,
   KiotaClientFactory,
-  MiddlewareFactory,
 } from "@microsoft/kiota-http-fetchlibrary";
 import { createClient, type Client } from "./generated/client";
 import {
@@ -11,7 +10,7 @@ import {
   getScope,
   MissionControlEnvironment,
 } from "./missionControlEnvironment";
-import { PartnerIdHandler } from "./partnerIdHandler";
+import { createHandlers } from "./missionControlHandlers";
 
 /**
  * Fluent builder for creating a configured {@link Client} instance.
@@ -126,11 +125,7 @@ export class ClientBuilder {
       allowedHosts,
     );
 
-    const middlewares = MiddlewareFactory.getDefaultMiddlewares();
-    if (this._defaultPartnerId) {
-      middlewares.unshift(new PartnerIdHandler(this._defaultPartnerId));
-    }
-
+    const middlewares = createHandlers(this._defaultPartnerId);
     const httpClient = KiotaClientFactory.create(undefined, middlewares);
     const adapter = new FetchRequestAdapter(
       authProvider,

@@ -4,7 +4,7 @@ The Node SDK for the [Mission:Control](https://www.missioncontrol.io) Partner AP
 
 ## Requirements
 
-- Node.js 18 or later
+Node.js 18 or later
 
 ## Installation
 

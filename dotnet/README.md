@@ -4,7 +4,7 @@ The .NET SDK for the [Mission:Control](https://www.missioncontrol.io) Partner AP
 
 ## Requirements
 
-- .NET 8 or later
+.NET 8 or later
 
 ## Installation
 
