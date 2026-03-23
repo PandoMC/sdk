@@ -13,6 +13,7 @@
     <RepositoryUrl>https://github.com/PandoMC/sdk</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>missioncontrol;partner;sdk</PackageTags>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
