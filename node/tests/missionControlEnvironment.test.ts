@@ -19,13 +19,13 @@ describe("MissionControlEnvironment", () => {
   describe("getBaseUrl", () => {
     it("returns the sandbox base URL for the Sandbox environment", () => {
       expect(getBaseUrl(MissionControlEnvironment.Sandbox)).toBe(
-        "https://api.sandbox.missioncontrol.io",
+        "https://api.sandbox.missioncontrol.io/partnerApi/v2",
       );
     });
 
     it("returns the production base URL for the Production environment", () => {
       expect(getBaseUrl(MissionControlEnvironment.Production)).toBe(
-        "https://api.missioncontrol.io",
+        "https://api.missioncontrol.io/partnerApi/v2",
       );
     });
 

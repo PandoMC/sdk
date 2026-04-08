@@ -3,8 +3,8 @@ namespace MissionControl.Client.UnitTests;
 public class MissionControlEnvironmentTests
 {
     [Theory]
-    [InlineData(MissionControlEnvironment.Sandbox, "https://api.sandbox.missioncontrol.io")]
-    [InlineData(MissionControlEnvironment.Production, "https://api.missioncontrol.io")]
+    [InlineData(MissionControlEnvironment.Sandbox, "https://api.sandbox.missioncontrol.io/partnerApi/v2")]
+    [InlineData(MissionControlEnvironment.Production, "https://api.missioncontrol.io/partnerApi/v2")]
     public void BaseUrl_ReturnsExpectedUrl(MissionControlEnvironment env, string expected)
     {
         Assert.Equal(expected, env.BaseUrl());
