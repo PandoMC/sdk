@@ -14,11 +14,11 @@ const settings: Record<
   { baseUrl: string; scope: string }
 > = {
   [MissionControlEnvironment.Sandbox]: {
-    baseUrl: "https://api.sandbox.missioncontrol.io",
+    baseUrl: "https://api.sandbox.missioncontrol.io/partnerApi/v2",
     scope: "api://38fbfaea-5648-4b51-ac09-d5d90117beff/.default",
   },
   [MissionControlEnvironment.Production]: {
-    baseUrl: "https://api.missioncontrol.io",
+    baseUrl: "https://api.missioncontrol.io/partnerApi/v2",
     scope: "api://1b6f40bc-e051-4b7e-987f-47a4a19fa5ef/.default",
   },
 };
