@@ -75,7 +75,7 @@ namespace MissionControl.Client.Generated
             ApiClientBuilder.RegisterDefaultDeserializer<FormParseNodeFactory>();
             if (string.IsNullOrEmpty(RequestAdapter.BaseUrl))
             {
-                RequestAdapter.BaseUrl = "http://api.test.missioncontrol.io/partnerApi/v2";
+                RequestAdapter.BaseUrl = "http://api.missioncontrol.io/partnerApi/v2";
             }
             PathParameters.TryAdd("baseurl", RequestAdapter.BaseUrl);
         }

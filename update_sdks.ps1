@@ -1,4 +1,4 @@
-$swaggerUrl = "https://api.test.missioncontrol.io/swagger/PartnerV2_0/swagger.json"
+$swaggerUrl = "https://api.missioncontrol.io/swagger/PartnerV2_0/swagger.json"
 $swaggerFile = "swagger.json"
 
 # Download file as raw text

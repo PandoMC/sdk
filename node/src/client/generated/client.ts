@@ -86,7 +86,7 @@ export function createClient(requestAdapter: RequestAdapter) {
     }
     
     if (requestAdapter.baseUrl === undefined || requestAdapter.baseUrl === null || requestAdapter.baseUrl === "") {
-        requestAdapter.baseUrl = "http://api.test.missioncontrol.io/partnerApi/v2";
+        requestAdapter.baseUrl = "http://api.missioncontrol.io/partnerApi/v2";
     }
     const pathParameters: Record<string, unknown> = {
         "baseurl": requestAdapter.baseUrl,
