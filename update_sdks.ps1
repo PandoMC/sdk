@@ -29,3 +29,12 @@ kiota generate `
     --output ./node/src/client/generated `
     --class-name client `
     --namespace-name missioncontrol.client
+
+# go
+Write-Host "Updating Go"
+kiota generate `
+    --openapi $swaggerFile `
+    --language go `
+    --output ./go/src/client/generated `
+    --class-name client `
+    --namespace-name mission_control/client
