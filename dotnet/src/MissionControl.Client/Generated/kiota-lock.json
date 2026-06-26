@@ -1,8 +1,8 @@
 {
-  "descriptionHash": "53F5655E53CAD62B89E7516699DCCE34E889B2C60BA1A43554EA7D9E090815CA0347C17931368F48B98FFC10B821B995F4220C1D8C8986AF4A0756CDDE151D4D",
+  "descriptionHash": "BAA14736D92DDDCC5514AEDDA4CBB363BD631F11F8F866137B467426B28CA83515C4F363D45106D48863C937E2D12297A0B4BB74245583675637DE9C235216EB",
   "descriptionLocation": "../../../../swagger.json",
   "lockFileVersion": "1.0.0",
-  "kiotaVersion": "1.30.0",
+  "kiotaVersion": "1.32.3",
   "clientClassName": "Client",
   "typeAccessModifier": "Public",
   "clientNamespaceName": "MissionControl.Client.Generated",

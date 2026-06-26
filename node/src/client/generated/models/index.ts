@@ -482,7 +482,7 @@ export function deserializeIntoClaimReservationRequest(claimReservationRequest: 
         "invoiceDate": n => { claimReservationRequest.invoiceDate = n.getDateValue(); },
         "partnerReference": n => { claimReservationRequest.partnerReference = n.getStringValue(); },
         "requestId": n => { claimReservationRequest.requestId = n.getGuidValue(); },
-        "salesChannel": n => { claimReservationRequest.salesChannel = n.getCollectionOfPrimitiveValues<Guid>(); },
+        "salesChannel": n => { claimReservationRequest.salesChannel = n.getCollectionOfPrimitiveValues<Guid>("string"); },
         "salesPrice": n => { claimReservationRequest.salesPrice = n.getObjectValue<SalesPriceRequest>(createSalesPriceRequestFromDiscriminatorValue); },
     }
 }
@@ -514,7 +514,7 @@ export function deserializeIntoCreateOrderRequest(createOrderRequest: Partial<Cr
         "productId": n => { createOrderRequest.productId = n.getGuidValue(); },
         "regionId": n => { createOrderRequest.regionId = n.getGuidValue(); },
         "requestId": n => { createOrderRequest.requestId = n.getGuidValue(); },
-        "salesChannel": n => { createOrderRequest.salesChannel = n.getCollectionOfPrimitiveValues<Guid>(); },
+        "salesChannel": n => { createOrderRequest.salesChannel = n.getCollectionOfPrimitiveValues<Guid>("string"); },
         "salesPrice": n => { createOrderRequest.salesPrice = n.getObjectValue<SalesPriceRequest>(createSalesPriceRequestFromDiscriminatorValue); },
     }
 }
@@ -714,7 +714,7 @@ export function deserializeIntoProblemDetails(problemDetails: Partial<ProblemDet
 // @ts-ignore
 export function deserializeIntoProduct(product: Partial<Product> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
-        "allowedRegions": n => { product.allowedRegions = n.getCollectionOfPrimitiveValues<Guid>(); },
+        "allowedRegions": n => { product.allowedRegions = n.getCollectionOfPrimitiveValues<Guid>("string"); },
         "canBeReserved": n => { product.canBeReserved = n.getBooleanValue(); },
         "id": n => { product.id = n.getGuidValue(); },
         "msrp": n => { product.msrp = n.getObjectValue<Money>(createMoneyFromDiscriminatorValue); },
@@ -787,7 +787,7 @@ export function deserializeIntoRedemptionInstruction(redemptionInstruction: Part
 export function deserializeIntoRegion(region: Partial<Region> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
         "archiveInfo": n => { region.archiveInfo = n.getObjectValue<ArchivingInfo>(createArchivingInfoFromDiscriminatorValue); },
-        "countries": n => { region.countries = n.getCollectionOfPrimitiveValues<string>(); },
+        "countries": n => { region.countries = n.getCollectionOfPrimitiveValues<string>("string"); },
         "id": n => { region.id = n.getGuidValue(); },
         "name": n => { region.name = n.getStringValue(); },
     }
@@ -819,7 +819,7 @@ export function deserializeIntoReportOrderRequest(reportOrderRequest: Partial<Re
         "productId": n => { reportOrderRequest.productId = n.getGuidValue(); },
         "regionId": n => { reportOrderRequest.regionId = n.getGuidValue(); },
         "requestId": n => { reportOrderRequest.requestId = n.getGuidValue(); },
-        "salesChannel": n => { reportOrderRequest.salesChannel = n.getCollectionOfPrimitiveValues<Guid>(); },
+        "salesChannel": n => { reportOrderRequest.salesChannel = n.getCollectionOfPrimitiveValues<Guid>("string"); },
         "salesPrice": n => { reportOrderRequest.salesPrice = n.getObjectValue<SalesPriceRequest>(createSalesPriceRequestFromDiscriminatorValue); },
     }
 }
