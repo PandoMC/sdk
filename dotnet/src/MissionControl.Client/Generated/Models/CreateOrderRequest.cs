@@ -13,6 +13,14 @@ namespace MissionControl.Client.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class CreateOrderRequest : IParsable
     {
+        /// <summary>The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? CountryCode { get; set; }
+#nullable restore
+#else
+        public string CountryCode { get; set; }
+#endif
         /// <summary>Represents the end consumer who buys a key.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -33,7 +41,7 @@ namespace MissionControl.Client.Generated.Models
 #endif
         /// <summary>Unique identifier of the product to buy.</summary>
         public Guid? ProductId { get; set; }
-        /// <summary>Unique identifier of the region in which the key is valid.</summary>
+        /// <summary>The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.</summary>
         public Guid? RegionId { get; set; }
         /// <summary>Uniquely identifies this request. Must be unique for each request you make. In case of errors, can be used for resolving.</summary>
         public Guid? RequestId { get; set; }
@@ -71,6 +79,7 @@ namespace MissionControl.Client.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "countryCode", n => { CountryCode = n.GetStringValue(); } },
                 { "endConsumer", n => { EndConsumer = n.GetObjectValue<global::MissionControl.Client.Generated.Models.Consumer>(global::MissionControl.Client.Generated.Models.Consumer.CreateFromDiscriminatorValue); } },
                 { "invoiceDate", n => { InvoiceDate = n.GetDateTimeOffsetValue(); } },
                 { "partnerReference", n => { PartnerReference = n.GetStringValue(); } },
@@ -88,6 +97,7 @@ namespace MissionControl.Client.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteStringValue("countryCode", CountryCode);
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.Consumer>("endConsumer", EndConsumer);
             writer.WriteDateTimeOffsetValue("invoiceDate", InvoiceDate);
             writer.WriteStringValue("partnerReference", PartnerReference);

@@ -229,6 +229,10 @@ export function createOrderListResultFromDiscriminatorValue(parseNode: ParseNode
  */
 export interface CreateOrderRequest extends Parsable {
     /**
+     * The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.
+     */
+    countryCode?: string | null;
+    /**
      * Represents the end consumer who buys a key.
      */
     endConsumer?: Consumer | null;
@@ -245,7 +249,7 @@ export interface CreateOrderRequest extends Parsable {
      */
     productId?: Guid | null;
     /**
-     * Unique identifier of the region in which the key is valid.
+     * The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.
      */
     regionId?: Guid | null;
     /**
@@ -392,11 +396,15 @@ export function createReservationFromDiscriminatorValue(parseNode: ParseNode | u
  */
 export interface CreateReservationRequest extends Parsable {
     /**
+     * The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.
+     */
+    countryCode?: string | null;
+    /**
      * Unique identifier of the product to reserve.
      */
     productId?: Guid | null;
     /**
-     * Unique identifier of the region in which the key is valid.
+     * The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.
      */
     regionId?: Guid | null;
 }
@@ -508,6 +516,7 @@ export function deserializeIntoConsumer(consumer: Partial<Consumer> | undefined 
 // @ts-ignore
 export function deserializeIntoCreateOrderRequest(createOrderRequest: Partial<CreateOrderRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
+        "countryCode": n => { createOrderRequest.countryCode = n.getStringValue(); },
         "endConsumer": n => { createOrderRequest.endConsumer = n.getObjectValue<Consumer>(createConsumerFromDiscriminatorValue); },
         "invoiceDate": n => { createOrderRequest.invoiceDate = n.getDateValue(); },
         "partnerReference": n => { createOrderRequest.partnerReference = n.getStringValue(); },
@@ -526,6 +535,7 @@ export function deserializeIntoCreateOrderRequest(createOrderRequest: Partial<Cr
 // @ts-ignore
 export function deserializeIntoCreateReservationRequest(createReservationRequest: Partial<CreateReservationRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
+        "countryCode": n => { createReservationRequest.countryCode = n.getStringValue(); },
         "productId": n => { createReservationRequest.productId = n.getGuidValue(); },
         "regionId": n => { createReservationRequest.regionId = n.getGuidValue(); },
     }
@@ -551,6 +561,7 @@ export function deserializeIntoDeduction(deduction: Partial<Deduction> | undefin
 // @ts-ignore
 export function deserializeIntoHasStockRequest(hasStockRequest: Partial<HasStockRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
+        "countryCode": n => { hasStockRequest.countryCode = n.getStringValue(); },
         "productId": n => { hasStockRequest.productId = n.getGuidValue(); },
         "regionId": n => { hasStockRequest.regionId = n.getGuidValue(); },
     }
@@ -868,11 +879,15 @@ export function deserializeIntoVatDetail(vatDetail: Partial<VatDetail> | undefin
  */
 export interface HasStockRequest extends Parsable {
     /**
+     * The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.
+     */
+    countryCode?: string | null;
+    /**
      * Identifier of the product to buy.
      */
     productId?: Guid | null;
     /**
-     * Identifier of the region.
+     * The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.
      */
     regionId?: Guid | null;
 }
@@ -1377,6 +1392,7 @@ export function serializeConsumer(writer: SerializationWriter, consumer: Partial
 // @ts-ignore
 export function serializeCreateOrderRequest(writer: SerializationWriter, createOrderRequest: Partial<CreateOrderRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!createOrderRequest || isSerializingDerivedType) { return; }
+    writer.writeStringValue("countryCode", createOrderRequest.countryCode);
     writer.writeObjectValue<Consumer>("endConsumer", createOrderRequest.endConsumer, serializeConsumer);
     writer.writeDateValue("invoiceDate", createOrderRequest.invoiceDate);
     writer.writeStringValue("partnerReference", createOrderRequest.partnerReference);
@@ -1395,6 +1411,7 @@ export function serializeCreateOrderRequest(writer: SerializationWriter, createO
 // @ts-ignore
 export function serializeCreateReservationRequest(writer: SerializationWriter, createReservationRequest: Partial<CreateReservationRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!createReservationRequest || isSerializingDerivedType) { return; }
+    writer.writeStringValue("countryCode", createReservationRequest.countryCode);
     writer.writeGuidValue("productId", createReservationRequest.productId);
     writer.writeGuidValue("regionId", createReservationRequest.regionId);
 }
@@ -1420,6 +1437,7 @@ export function serializeDeduction(writer: SerializationWriter, deduction: Parti
 // @ts-ignore
 export function serializeHasStockRequest(writer: SerializationWriter, hasStockRequest: Partial<HasStockRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!hasStockRequest || isSerializingDerivedType) { return; }
+    writer.writeStringValue("countryCode", hasStockRequest.countryCode);
     writer.writeGuidValue("productId", hasStockRequest.productId);
     writer.writeGuidValue("regionId", hasStockRequest.regionId);
 }
