@@ -4,12 +4,12 @@ import {
   FetchRequestAdapter,
   KiotaClientFactory,
 } from "@microsoft/kiota-http-fetchlibrary";
-import { createClient, type Client } from "./generated/client";
 import {
   getBaseUrl,
   getScope,
   MissionControlEnvironment,
 } from "./missionControlEnvironment";
+import { createClient, type Client } from "./generated/client";
 import { createHandlers } from "./missionControlHandlers";
 
 /**

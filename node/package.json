@@ -6,15 +6,27 @@
   "homepage": "https://github.com/PandoMC/sdk/tree/main/node",
   "repository": "github:PandoMC/sdk",
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias --resolve-full-paths --resolve-full-extension .js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
+    "tsc-alias": "^1.9.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   },
