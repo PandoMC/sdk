@@ -25,14 +25,14 @@
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.0.1",
     "tsc-alias": "^1.9.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.0"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   },
   "dependencies": {
-    "@azure/identity": "^4.13.0",
-    "@microsoft/kiota-authentication-azure": "^1.0.0-preview.100",
-    "@microsoft/kiota-bundle": "^1.0.0-preview.100"
+    "@azure/identity": "^4.13.1",
+    "@microsoft/kiota-authentication-azure": "^1.0.0-preview.103",
+    "@microsoft/kiota-bundle": "^1.0.0-preview.103"
   }
 }
