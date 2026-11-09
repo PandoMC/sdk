@@ -13,7 +13,7 @@ namespace MissionControl.Client.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class HasStockRequest : IParsable
     {
-        /// <summary>The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.</summary>
+        /// <summary>Recommended: the consumer&apos;s ISO 3166-1 alpha-2 country code, chosen from the product&apos;s allowedCountries.Mission:Control resolves an allowed region automatically. Supply exactly one of CountryCode and RegionId.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? CountryCode { get; set; }
@@ -23,7 +23,7 @@ namespace MissionControl.Client.Generated.Models
 #endif
         /// <summary>Identifier of the product to buy.</summary>
         public Guid? ProductId { get; set; }
-        /// <summary>The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.</summary>
+        /// <summary>Alternative to CountryCode for explicit region selection. Supply exactly one of RegionId and CountryCode.</summary>
         public Guid? RegionId { get; set; }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value

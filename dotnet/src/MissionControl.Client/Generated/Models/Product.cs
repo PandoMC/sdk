@@ -13,7 +13,15 @@ namespace MissionControl.Client.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Product : IParsable
     {
-        /// <summary>Id&apos;s of the regions where this product is allowed.</summary>
+        /// <summary>Distinct ISO 3166-1 alpha-2 country codes where this partner may sell the product.Resolved from the allowed regions returned for the request.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? AllowedCountries { get; set; }
+#nullable restore
+#else
+        public List<string> AllowedCountries { get; set; }
+#endif
+        /// <summary>Region IDs available for explicit region selection. For country-based ordering, use AllowedCountries instead.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public List<Guid?>? AllowedRegions { get; set; }
@@ -24,8 +32,8 @@ namespace MissionControl.Client.Generated.Models
         /// <summary>Indicates whether keys for this product can be reserved. The reserve API can only be used for products where this is true.</summary>
         public bool? CanBeReserved { get; set; }
         /// <summary>Unique identifier.</summary>
-        public Guid? Id { get; private set; }
-        /// <summary>Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.</summary>
+        public Guid? Id { get; set; }
+        /// <summary>Manufacturer&apos;s Suggested Retail Price (MSRP) for the product. This property is only populatedwhen bool GetProductsRequest.IncludeMsrp is provided and pricing information isavailable for the specified country. Returns null if no country code was provided or pricinginformation is unavailable.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Money? Msrp { get; set; }
@@ -36,35 +44,37 @@ namespace MissionControl.Client.Generated.Models
         /// <summary>Name of the product.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? Name { get; private set; }
+        public string? Name { get; set; }
 #nullable restore
 #else
-        public string Name { get; private set; }
+        public string Name { get; set; }
 #endif
-        /// <summary>Defines values for gaming platforms.</summary>
+        /// <summary>Identifier of the platform for which the keys of this product are valid. Possible values:1 = Steam, 2 = Xbox, 3 = PlayStation, 4 = Nintendo, 5 = Epic Games, 6 = Electronic Arts, 99 = Other</summary>
         public int? PlatformId { get; set; }
         /// <summary>Human readable description of the platform. Do not use this for programmatic purposes.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? PlatformName { get; private set; }
+        public string? PlatformName { get; set; }
 #nullable restore
 #else
-        public string PlatformName { get; private set; }
+        public string PlatformName { get; set; }
 #endif
         /// <summary>Human-readable description of the product type.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? ProductTypeDescription { get; private set; }
+        public string? ProductTypeDescription { get; set; }
 #nullable restore
 #else
-        public string ProductTypeDescription { get; private set; }
+        public string ProductTypeDescription { get; set; }
 #endif
         /// <summary>Type of the product.</summary>
-        public int? ProductTypeId { get; private set; }
+        public int? ProductTypeId { get; set; }
         /// <summary>Identifier of the publisher of the product.</summary>
         public Guid? PublisherId { get; set; }
         /// <summary>Date the product is released.</summary>
-        public DateTimeOffset? ReleaseDate { get; private set; }
+        public DateTimeOffset? ReleaseDate { get; set; }
+        /// <summary>Defines the type of value associated with the product. For example, a gift card may have a variable value, while a game key has a fixed value.</summary>
+        public int? ValueType { get; set; }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
         /// </summary>
@@ -83,6 +93,7 @@ namespace MissionControl.Client.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "allowedCountries", n => { AllowedCountries = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "allowedRegions", n => { AllowedRegions = n.GetCollectionOfPrimitiveValues<Guid?>()?.AsList(); } },
                 { "canBeReserved", n => { CanBeReserved = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetGuidValue(); } },
@@ -94,6 +105,7 @@ namespace MissionControl.Client.Generated.Models
                 { "productTypeId", n => { ProductTypeId = n.GetIntValue(); } },
                 { "publisherId", n => { PublisherId = n.GetGuidValue(); } },
                 { "releaseDate", n => { ReleaseDate = n.GetDateTimeOffsetValue(); } },
+                { "valueType", n => { ValueType = n.GetIntValue(); } },
             };
         }
         /// <summary>
@@ -103,11 +115,19 @@ namespace MissionControl.Client.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteCollectionOfPrimitiveValues<string>("allowedCountries", AllowedCountries);
             writer.WriteCollectionOfPrimitiveValues<Guid?>("allowedRegions", AllowedRegions);
             writer.WriteBoolValue("canBeReserved", CanBeReserved);
+            writer.WriteGuidValue("id", Id);
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.Money>("msrp", Msrp);
+            writer.WriteStringValue("name", Name);
             writer.WriteIntValue("platformId", PlatformId);
+            writer.WriteStringValue("platformName", PlatformName);
+            writer.WriteStringValue("productTypeDescription", ProductTypeDescription);
+            writer.WriteIntValue("productTypeId", ProductTypeId);
             writer.WriteGuidValue("publisherId", PublisherId);
+            writer.WriteDateTimeOffsetValue("releaseDate", ReleaseDate);
+            writer.WriteIntValue("valueType", ValueType);
         }
     }
 }

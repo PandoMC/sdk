@@ -60,7 +60,7 @@ namespace MissionControl.Client.Generated.Reservation
         {
         }
         /// <summary>
-        /// Creates a reservation that later can be redeemed to create an order.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
+        /// Creates a reservation that later can be redeemed to create an order.Supply productId and countryCode (ISO 3166-1 alpha-2). GET Product returns the product&apos;s allowedCountries.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
         /// </summary>
         /// <returns>A <see cref="global::MissionControl.Client.Generated.Models.Reservation"/></returns>
         /// <param name="body">Request to send to create a reservation.</param>
@@ -87,7 +87,7 @@ namespace MissionControl.Client.Generated.Reservation
             return await RequestAdapter.SendAsync<global::MissionControl.Client.Generated.Models.Reservation>(requestInfo, global::MissionControl.Client.Generated.Models.Reservation.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Creates a reservation that later can be redeemed to create an order.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
+        /// Creates a reservation that later can be redeemed to create an order.Supply productId and countryCode (ISO 3166-1 alpha-2). GET Product returns the product&apos;s allowedCountries.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">Request to send to create a reservation.</param>

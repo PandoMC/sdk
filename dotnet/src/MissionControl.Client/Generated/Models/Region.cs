@@ -24,20 +24,20 @@ namespace MissionControl.Client.Generated.Models
         /// <summary>ISO 3166-1 alpha-2 country codes that are part of the region. Please be aware that multiple regions can have the same country code, they are not mutally exclusive.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<string>? Countries { get; private set; }
+        public List<string>? Countries { get; set; }
 #nullable restore
 #else
-        public List<string> Countries { get; private set; }
+        public List<string> Countries { get; set; }
 #endif
         /// <summary>Unique identifier for the region.</summary>
-        public Guid? Id { get; private set; }
+        public Guid? Id { get; set; }
         /// <summary>Name of the region.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? Name { get; private set; }
+        public string? Name { get; set; }
 #nullable restore
 #else
-        public string Name { get; private set; }
+        public string Name { get; set; }
 #endif
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -71,6 +71,9 @@ namespace MissionControl.Client.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.ArchivingInfo>("archiveInfo", ArchiveInfo);
+            writer.WriteCollectionOfPrimitiveValues<string>("countries", Countries);
+            writer.WriteGuidValue("id", Id);
+            writer.WriteStringValue("name", Name);
         }
     }
 }

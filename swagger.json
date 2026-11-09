@@ -1,8 +1,8 @@
-﻿{
-  "openapi": "3.0.4",
+{
+  "openapi": "3.1.1",
   "info": {
     "title": "Partner API 2.0",
-    "description": "### Overview\n\nThe Mission:Control Partner API enables partners to integrate with product catalogues of publishers. The API provides endpoints to create orders and retrieve a product catalogue. The API uses standard HTTP response codes to indicate API errors. JSON is returned in all of the responses from the API, this also includes errors.\n\n---\n\n### Authentication and authorization\n\nTo access the Mission:Control Partner API, you'll need to authenticate using application credentials. These credentials enable you to retrieve an access token. Please use the OAuth 2.0 client's \"grant credentials flow\" with your _client ID_ and _client secret_ to obtain the token.\n\nFor detailed instructions, refer to the [Microsoft documentation](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow) on the OAuth 2.0 client credentials grant flow.\n\n#### Get a token\n\nYou'll need to make a POST request to the token endpoint:\n\n- `https://login.microsoftonline.com/13d084c1-d072-41f2-878b-c45ca721c9f6/oauth2/v2.0/token`\n\n##### Request headers\n\n- `Content-Type: application/x-www-form-urlencoded`\n\n##### Request body\n\n- `client_id` 00001111-aaaa-2222-bbbb-3333cccc4444\n- `client_secret` qWgdYAmab0YSkuL1qKv5bPX\n- `grant_type` client_credentials\n- `scope` api://1b6f40bc-e051-4b7e-987f-47a4a19fa5ef/.default\n\n#### Successful response\n\nA successful response looks like this:\n\n```json\n{\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 3599,\n  \"access_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBP...\"\n}\n```\n\n| Parameter      | Description                                                                                                           |\n| -------------- | --------------------------------------------------------------------------------------------------------------------- |\n| `access_token` | The requested access token. The app can use this token to authenticate to the secured resource, such as to a web API. |\n| `token_type`   | Indicates the token type value. The only type that the Microsoft identity platform supports is bearer.                |\n| `expires_in`   | The amount of time that an access token is valid (in seconds).                                                        |\n\n---\n\n### Errors\n\nMission:Control follows standard HTTP response codes to communicate the outcome of an API request. Generally: Codes in the 2xx range mean the request was successful. Codes in the 4xx range indicate client-side issues, such as missing required parameters or non-existent resources. Codes in the 5xx range indicate server errors on Mission:Control's side (though these are rare).\n\n|                Code | Meaning       | Description                                                                                                |\n| ------------------: | ------------- | ---------------------------------------------------------------------------------------------------------- |\n|                 200 | OK            | Everything worked as expected.                                                                             |\n|     400<sup>a</sup> | Bad Request   | The request cannot be processed, often due to missing a required parameter.                                |\n|                 401 | Unauthorized  | Access token was invalid, missing or has expired.                                                          |\n|                 403 | Forbidden     | The authenticated client doesn't have permissions to perform the request.                                  |\n|                 404 | Not Found     | The requested endpoint doesn't exist. If an entity could not be found, a 400 status code will be returned. |\n| 500 , 502, 503, 504 | Server Errors | Something went wrong on Mission:Control's end.                                                             |\n\n<sup>a</sup> = This provides the error in a machine-readable format, as defined in [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807).\n\nError example when an unknown productId was provided:\n\n```\n{\n    \"type\": \"ValidationError\",\n    \"title\": \"Bad Request\",\n    \"status\": 400,\n    \"detail\": \"Unknown product\",\n    \"traceId\": \"00-631d653ab048925ad734399881618d69-2f155bb90daead3b-00\"\n}\n```\n\nError example when a required field was not provided:\n\n```\n{\n    \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\n    \"title\": \"One or more validation errors occurred.\",\n    \"status\": 400,\n    \"errors\": {\n        \"InvoiceDate\": [\n            \"The InvoiceDate field is required.\"\n        ]\n    },\n    \"traceId\": \"00-e19b22876de9ec4a42c6cb53300bf1df-96cd38f4b237b01a-00\"\n}\n```\n\n---\n\n### Pagination\n\nMost of our top-level API resources support pagination for bulk fetches through \"list\" API methods. Resources that support pagination include **partner**, **publisher**, and **region**. Pagination in these resources allows you to control the number of objects returned and navigate through pages of data using the `pageSize` and `pageIndex` parameters.\n\n#### Query parameters\n\n| Parameter   | Default | Description                                                                                                                                                     |\n| ----------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| `pageSize`  | 10      | Limits the number of objects returned in each response.                                                                                                         |\n| `pageIndex` | 0       | This parameter controls which page of results to fetch, where each page contains up to `pageSize` items. The default of `pageIndex` 0 retrieves the first page. |\n\n#### Response format\n\nExample response for a paginated list of regions requesting the first page of 10 items:\n\n```json\n{\n    \"result\": [\n        {\n            \"id\": \"dac3d2ea-2f07-468a-86e1-54e20659dafa\",\n            \"name\": \"Americas\"\n        },\n        {\n            \"id\": \"80cffc8d-fdee-4917-a502-b7776f6b1a22\",\n            \"name\": \"APAC (Asia-Pacific)\"\n        }\n        ...\n    ],\n    \"totalCount\": 11,\n    \"pageCount\": 2\n}\n```\n\n| Parameter    | Description                                                                                                                                                                               |\n| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| `result`     | An array containing objects of the requested resource.                                                                                                                                    |\n| `totalCount` | Indicates the total number of items across all pages (in this case, 11). This helps in cases where results are displayed across multiple pages, enabling users to know the overall count. |\n| `pageCount`  | Specifies the total number of pages in this paginated dataset. Here, the data is divided across 2 pages.                                                                                  |\n\n---\n\n### Product mapping\n\nA key within Mission:Control is linked to a product and region. When creating an order, you must supply a **product ID** together with one of two ways to identify the target region:\n\n| Option | Field | Recommended? |\n|---|---|---|\n| Country code | `countryCode` (ISO 3166-1 alpha-2) | ✅ Recommended — Mission:Control resolves the matching region automatically |\n| Region ID | `regionId` (UUID) | For partners who need explicit control over region selection |\n\nSupply **one, and only one** of these fields per order request.\n\n#### Product library\n\nBefore starting the mapping, prepare the following data for your products:\n\n- Product ID\n- Product Name\n- Country Code ([ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)) **or** Region ID\n\nUse the product library in our portal to gain insight into which publishers you have access to and which products they have set up in which regions to sell keys. In this library, you can find the relevant product, the regions where it can be sold, and the corresponding region IDs.\n\n#### API Integration with Mission:Control\n\nMission:Control also provides an API to fully gain insights in all products they are allowed to sell.\n\nEndpoints: Use endpoints to retrieve publishers, product data and regional information. API calls include:\n\n- GET `/publishers`: To retrieve the list of available publishers.\n- GET `/products`: To retrieve the list of all products. This endpoint expects a `publisherId` to specify for which publisher the products are being requested.\n- GET `/regions`: To retrieve the list of supported regions in Mission:Control, including their IDs.\n\n#### Mapping products\n\nOnce the data is available, the actual mapping process involves aligning your products with their respective product IDs and either a country code or region ID in Mission:Control.\n\n#### Mapping scenario\nYou want to sell the product **Zoo Keeper Pro** specifically to users in **China**. In your system, this product is known as **Zoo Keeper Pro - Chinese edition** with an internal product ID of **146**.\n\nIn the Mission:Control portal, you find the following information in the product library:\n\n| Product Name   | Publisher Name           | Platform | Product ID                                                    | Region    | Region ID                                                     |\n|----------------|--------------------------|----------|---------------------------------------------------------------|-----------|---------------------------------------------------------------|\n| Zoo Keeper Pro | Nebulous Origins Studios | Steam    | <sub>9952a727-3198-46ba-8354-597560e1aa9c</sub>               | Worldwide | <sub>75a6de4f-81d7-4252-9839-19274be069ad</sub>               |\n| Zoo Keeper Pro | Nebulous Origins Studios | Steam    | <sub>9952a727-3198-46ba-8354-597560e1aa9c</sub>               | China     | <sub>f20c05fc-b57c-419e-8f3c-08ba700a2726</sub>               |\n\nTo create an order via the Mission:Control Partner API, map your system's identifiers with the relevant product ID from Mission:Control and either a country code or region ID for the target market.\n\nIn this case:\n- Your product **Zoo Keeper Pro - Chinese Edition (ID: 146)** maps to Product ID **9952a727-3198-46ba-8354-597560e1aa9c** in Mission:Control.\n- **Recommended:** Supply country code **CN** as `countryCode` — Mission:Control will resolve the China region automatically.\n- **Alternative:** Supply **f20c05fc-b57c-419e-8f3c-08ba700a2726** as `regionId` to target the China region directly.\n\n### X-Partner-Id Header\n\nWhen making requests to the Partner API, the client needs to include an `X-Partner-Id` header. This value uniquely identifies the partner. This value is provided via e-mail.\n",
+    "description": "### Overview\n\nThe Mission:Control Partner API enables partners to integrate with product catalogues of publishers. The API provides endpoints to create orders and retrieve a product catalogue. The API uses standard HTTP response codes to indicate API errors. JSON is returned in all of the responses from the API, this also includes errors.\n\n---\n\n### Authentication and authorization\n\nTo access the Mission:Control Partner API, you'll need to authenticate using application credentials. These credentials enable you to retrieve an access token. Please use the OAuth 2.0 client's \"grant credentials flow\" with your _client ID_ and _client secret_ to obtain the token.\n\nFor detailed instructions, refer to the [Microsoft documentation](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-client-creds-grant-flow) on the OAuth 2.0 client credentials grant flow.\n\n#### Get a token\n\nYou'll need to make a POST request to the token endpoint:\n\n- `https://login.microsoftonline.com/13d084c1-d072-41f2-878b-c45ca721c9f6/oauth2/v2.0/token`\n\n##### Request headers\n\n- `Content-Type: application/x-www-form-urlencoded`\n\n##### Request body\n\n- `client_id` 00001111-aaaa-2222-bbbb-3333cccc4444\n- `client_secret` qWgdYAmab0YSkuL1qKv5bPX\n- `grant_type` client_credentials\n- `scope` api://1b6f40bc-e051-4b7e-987f-47a4a19fa5ef/.default\n\n#### Successful response\n\nA successful response looks like this:\n\n```json\n{\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 3599,\n  \"access_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBP...\"\n}\n```\n\n| Parameter      | Description                                                                                                           |\n| -------------- | --------------------------------------------------------------------------------------------------------------------- |\n| `access_token` | The requested access token. The app can use this token to authenticate to the secured resource, such as to a web API. |\n| `token_type`   | Indicates the token type value. The only type that the Microsoft identity platform supports is bearer.                |\n| `expires_in`   | The amount of time that an access token is valid (in seconds).                                                        |\n\n---\n\n### Errors\n\nMission:Control follows standard HTTP response codes to communicate the outcome of an API request. Generally: Codes in the 2xx range mean the request was successful. Codes in the 4xx range indicate client-side issues, such as missing required parameters or non-existent resources. Codes in the 5xx range indicate server errors on Mission:Control's side (though these are rare).\n\n|                Code | Meaning       | Description                                                                                                |\n| ------------------: | ------------- | ---------------------------------------------------------------------------------------------------------- |\n|                 200 | OK            | Everything worked as expected.                                                                             |\n|     400<sup>a</sup> | Bad Request   | The request cannot be processed, often due to missing a required parameter.                                |\n|                 401 | Unauthorized  | Access token was invalid, missing or has expired.                                                          |\n|                 403 | Forbidden     | The authenticated client doesn't have permissions to perform the request.                                  |\n|                 404 | Not Found     | The requested endpoint doesn't exist. If an entity could not be found, a 400 status code will be returned. |\n| 500 , 502, 503, 504 | Server Errors | Something went wrong on Mission:Control's end.                                                             |\n\n<sup>a</sup> = This provides the error in a machine-readable format, as defined in [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807).\n\nError example when an unknown productId was provided:\n\n```\n{\n    \"type\": \"ValidationError\",\n    \"title\": \"Bad Request\",\n    \"status\": 400,\n    \"detail\": \"Unknown product\",\n    \"traceId\": \"00-631d653ab048925ad734399881618d69-2f155bb90daead3b-00\"\n}\n```\n\nError example when a required field was not provided:\n\n```\n{\n    \"type\": \"https://tools.ietf.org/html/rfc9110#section-15.5.1\",\n    \"title\": \"One or more validation errors occurred.\",\n    \"status\": 400,\n    \"errors\": {\n        \"InvoiceDate\": [\n            \"The InvoiceDate field is required.\"\n        ]\n    },\n    \"traceId\": \"00-e19b22876de9ec4a42c6cb53300bf1df-96cd38f4b237b01a-00\"\n}\n```\n\n---\n\n### Pagination\n\nMost of our top-level API resources support pagination for bulk fetches through \"list\" API methods. Resources that support pagination include **product** (v2), **partner**, and **publisher**. Pagination in these resources allows you to control the number of objects returned and navigate through pages of data using the `pageSize` and `pageIndex` parameters.\n\n#### Query parameters\n\n| Parameter   | Default | Description                                                                                                                                                     |\n| ----------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| `pageSize`  | 10      | Limits the number of objects returned in each response.                                                                                                         |\n| `pageIndex` | 0       | This parameter controls which page of results to fetch, where each page contains up to `pageSize` items. The default of `pageIndex` 0 retrieves the first page. |\n\n#### Response format\n\nExample response for a product catalogue containing two products, requesting the first page of 10 items (other product fields omitted):\n\n```json\n{\n    \"result\": [\n        {\n            \"id\": \"9952a727-3198-46ba-8354-597560e1aa9c\",\n            \"name\": \"Zoo Keeper Pro\",\n            \"allowedCountries\": [\"BE\", \"CN\", \"NL\"]\n        },\n        {\n            \"id\": \"80cffc8d-fdee-4917-a502-b7776f6b1a22\",\n            \"name\": \"Zoo Keeper Pro - Expansion\",\n            \"allowedCountries\": [\"BE\", \"NL\"]\n        }\n    ],\n    \"totalCount\": 2,\n    \"pageCount\": 1\n}\n```\n\n| Parameter    | Description                                                                                                                                                                               |\n| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| `result`     | An array containing objects of the requested resource.                                                                                                                                    |\n| `totalCount` | Indicates the total number of items across all pages (in this case, 2). |\n| `pageCount`  | Specifies the total number of pages in this paginated dataset (in this case, 1). |\n\n---\n\n### Product mapping\n\nFor new integrations, use **Partner API v2** and order using the product's **`productId`** and the consumer's **`countryCode`**. Country codes use ISO 3166-1 alpha-2, for example `NL`, `BE`, or `CN`. Mission:Control selects an allowed region for the product and country automatically.\n\n| Option | Field | Usage |\n|---|---|---|\n| Country code | `countryCode` (ISO 3166-1 alpha-2) | Recommended for ordering, stock checks, and reservations in v2 |\n| Region ID | `regionId` (UUID) | Supported for partners who want explicit control over region selection |\n\nSupply **exactly one** of `countryCode` and `regionId` in each of these requests. Sending both, or neither, results in a validation error.\n\n#### Product library\n\nUse the product library in the partner portal to find:\n\n- Product ID\n- Product Name\n- Countries where your partner account may sell the product, shown as country codes in the Countries column\n\nMatch each product in your own catalogue to its Mission:Control product ID. Check that the consumer's country is included in the product's allowed countries before offering it for sale. The product library export contains one row per product with comma-separated country codes in the Countries column.\n\n#### API Integration with Mission:Control\n\nYou can automate product mapping using the Partner API:\n\n- GET `/Publisher`: Retrieve the publishers available to your partner account.\n- GET `/Product`: Retrieve products, including each product's `id` and `allowedCountries`. Use `id` as `productId` in order requests. You can optionally filter by publisher or `countryCode`.\n- POST `/Product/hasStock`: Check stock using `productId` and `countryCode`.\n- POST `/Order/createOrder`: Create an order using `productId` and `countryCode`, together with the other required order details.\n- POST `/Reservation`: Reserve a key using `productId` and `countryCode` for products where `canBeReserved` is true.\n\nCall GET Product regularly to keep product availability and allowed countries up to date. `allowedCountries` describes permission to sell; it does not guarantee that stock is available. Handle out-of-stock and access errors when placing an order.\n\n#### Mapping products\n\nStore the Mission:Control product ID with the corresponding product in your system. At checkout, send the consumer's country as `countryCode`; you do not need to store or look up region IDs for this flow.\n\n#### Mapping scenario\nYou want to sell the product **Zoo Keeper Pro** to users in **China**. In your system, this product is known as **Zoo Keeper Pro - Chinese edition** with an internal product ID of **146**.\n\nIn the Mission:Control portal, you find the following information in the product library:\n\n| Product Name | Publisher Name | Platform | Product ID | Countries |\n|---|---|---|---|---|\n| Zoo Keeper Pro | Nebulous Origins Studios | Steam | 9952a727-3198-46ba-8354-597560e1aa9c | BE, CN, NL |\n\nYour product **Zoo Keeper Pro - Chinese edition (ID: 146)** maps to Mission:Control product ID **9952a727-3198-46ba-8354-597560e1aa9c**. The Countries column includes `CN`, so you can order it for a consumer in China.\n\nFor example, the stock-check request to POST `/Product/hasStock` is:\n\n```json\n{\n  \"productId\": \"9952a727-3198-46ba-8354-597560e1aa9c\",\n  \"countryCode\": \"CN\"\n}\n```\n\nUse the same `productId` and `countryCode` when creating the order, along with the other required fields documented by POST `/Order/createOrder`.\n\n#### Explicit region selection and existing integrations\n\nRegions remain supported for partners who prefer explicit control. GET `/Region?publisherId={publisherId}` returns the publisher's region definitions and their country codes. Select a region ID from the product's `allowedRegions` and send it as `regionId` instead of `countryCode`. The publisher's complete region list may include regions where you are not allowed to purchase that product.\n\nAPI v1 order creation and stock checks require `regionId`; use v2 for country-based ordering. The `reportOrder` endpoint in both versions also requires `regionId` and does not currently accept `countryCode`.\n\n### Redemption instructions before purchase\n\nGET `/Product/{productId}/redemptionInstructions` retrieves all available translations without placing an order. Use a product ID from your partner catalog. Each list item contains a language or culture code and the corresponding plain-text instructions.\n\n```json\n[\n  {\n    \"languageCode\": \"en\",\n    \"text\": \"Open Steam and choose Games > Activate a Product on Steam.\"\n  },\n  {\n    \"languageCode\": \"nl\",\n    \"text\": \"Open Steam en kies Games > Activate a Product on Steam.\"\n  }\n]\n```\n\nSelect the language appropriate for your user from this list. The endpoint returns an empty list if no instructions exist and HTTP 404 if the product is unavailable to your partner account. No order, reservation, or key allocation is required. Order responses continue to return a single translation using the consumer's requested language and the existing language fallback.\n\nIn the partner portal, open a product from the product library to preview and copy its redemption instructions. The language selector shows the translations available for that product.\n\n### X-Partner-Id Header\n\nWhen making requests to the Partner API, the client needs to include an `X-Partner-Id` header. This value uniquely identifies the partner. This value is provided via e-mail.\n",
     "version": "v2"
   },
   "servers": [
@@ -14,328 +14,29 @@
     "/Order/createOrder": {
       "post": {
         "tags": [
-          "Order v2.0"
+          "Order"
         ],
-        "summary": "Creates a new order and returns a key for the specified product in the requested region.",
-        "description": "Available products can be retrieved using the GET Product endpoint.\n            \nAvailable regions can be retrieved using the GET Region endpoint.\n            \nCurrency codes can't be mixed in a single order.\nMost fields in the MissionControl.Application.Sales.Dto.Partner.SalesPriceRequest are required, with a few exceptions:\n- VatDetail: Only one of its properties—Rate, Amount or PriceExcludingVat should be set explicitly. If more than one is provided, the system will raise a validation error. The remaining properties will be calculated automatically based on the value provided.\n- Sales channel: This is optional. If the key is sold directly to the end consumer, the sales channel can remain empty. However, if intermediaries are involved, their partner IDs must be listed in the correct order of distribution.\n- Deductions: This field is also optional. It can be used to record various fees, commissions, or discounts that may have affected the final sale amount.\n            \n**Enhanced Capabilities (v2.0):**  \nThis endpoint supports all key suppliers, including those requiring additional information:\n- **Epay**: Requires end consumer language and returns redemption information (URL, description).",
-        "parameters": [
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "summary": "Creates a new order and returns a key for the specified product and country.",
+        "description": "Use productId and countryCode (ISO 3166-1 alpha-2) for country-based ordering.\nGET Product returns each product's allowedCountries. Mission:Control resolves an allowed region automatically.\n\nFor explicit region selection, supply regionId instead of countryCode, using the product's allowedRegions and GET Region.\nSupply exactly one of countryCode and regionId.\n\nCurrency codes can't be mixed in a single order.\nMost fields in the SalesPriceRequest are required, with a few exceptions:\n- VatDetail: Only one of its properties—Rate, Amount or PriceExcludingVat should be set explicitly. If more than one is provided, the system will raise a validation error. The remaining properties will be calculated automatically based on the value provided.\n- Sales channel: This is optional. If the key is sold directly to the end consumer, the sales channel can remain empty. However, if intermediaries are involved, their partner IDs must be listed in the correct order of distribution.\n- Deductions: This field is also optional. It can be used to record various fees, commissions, or discounts that may have affected the final sale amount.\n\n**Enhanced Capabilities (v2.0):**  \nThis endpoint supports all key suppliers, including those requiring additional information:\n- **Epay**: Requires end consumer language and returns redemption information (URL, description).",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateOrderRequest"
-              },
-              "examples": {
-                "Price excluding VAT": {
-                  "summary": "Create Order with VAT based on price excluding VAT",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "VAT amount": {
-                  "summary": "Create Order with VAT based on VAT amount",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"amount":{"value":20.90,"currencyCode":"EUR"}},"deductions":[]},"salesChannel":[]}
-                },
-                "VAT rate": {
-                  "summary": "Create Order with VAT based on VAT rate",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "With Consumer Language": {
-                  "summary": "Create Order with consumer language (required for Epay products to receive redemption information)",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "Sales Channel": {
-                  "summary": "Create Order for a key that went through multiple partners before it reached the customer.",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":["545a9add-aff7-4a35-b646-8edd04ac9496","3964cdbe-e414-435f-90ec-e295f2388516"]}
-                },
-                "Deductions": {
-                  "summary": "Create Order where deductions have been applied.",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[{"type":3,"amount":{"value":4.50,"currencyCode":"EUR"}},{"type":1,"amount":{"value":20.00,"currencyCode":"EUR"},"name":"Apple Pay fee"},{"type":1,"amount":{"value":0.60,"currencyCode":"EUR"},"name":"1% discount"}]},"salesChannel":[]}
-                }
               }
             },
             "text/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateOrderRequest"
-              },
-              "examples": {
-                "Price excluding VAT": {
-                  "summary": "Create Order with VAT based on price excluding VAT",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "VAT amount": {
-                  "summary": "Create Order with VAT based on VAT amount",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"amount":{"value":20.90,"currencyCode":"EUR"}},"deductions":[]},"salesChannel":[]}
-                },
-                "VAT rate": {
-                  "summary": "Create Order with VAT based on VAT rate",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "With Consumer Language": {
-                  "summary": "Create Order with consumer language (required for Epay products to receive redemption information)",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "Sales Channel": {
-                  "summary": "Create Order for a key that went through multiple partners before it reached the customer.",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":["545a9add-aff7-4a35-b646-8edd04ac9496","3964cdbe-e414-435f-90ec-e295f2388516"]}
-                },
-                "Deductions": {
-                  "summary": "Create Order where deductions have been applied.",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[{"type":3,"amount":{"value":4.50,"currencyCode":"EUR"}},{"type":1,"amount":{"value":20.00,"currencyCode":"EUR"},"name":"Apple Pay fee"},{"type":1,"amount":{"value":0.60,"currencyCode":"EUR"},"name":"1% discount"}]},"salesChannel":[]}
-                }
               }
             },
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateOrderRequest"
-              },
-              "examples": {
-                "Price excluding VAT": {
-                  "summary": "Create Order with VAT based on price excluding VAT",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "VAT amount": {
-                  "summary": "Create Order with VAT based on VAT amount",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"amount":{"value":20.90,"currencyCode":"EUR"}},"deductions":[]},"salesChannel":[]}
-                },
-                "VAT rate": {
-                  "summary": "Create Order with VAT based on VAT rate",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "With Consumer Language": {
-                  "summary": "Create Order with consumer language (required for Epay products to receive redemption information)",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":[]}
-                },
-                "Sales Channel": {
-                  "summary": "Create Order for a key that went through multiple partners before it reached the customer.",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[]},"salesChannel":["545a9add-aff7-4a35-b646-8edd04ac9496","3964cdbe-e414-435f-90ec-e295f2388516"]}
-                },
-                "Deductions": {
-                  "summary": "Create Order where deductions have been applied.",
-                  "value": {"requestId":"d290f1ee-6c54-4b01-90e6-d701748f0851","productId":"80bd6d7b-cbe4-4279-af5f-fdaa16998e50","regionId":"2a365331-f331-43b7-b846-34e7dfb6d471","endConsumer":{"ipAddress":"62.163.212.228","location":{"countryCode":"NL","region":"North Holland","city":"Amsterdam"},"browser":{"userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","acceptLanguage":"en-US,en;q=0.9,sq;q=0.8"},"language":"nl-NL"},"partnerReference":"ORDER-45123","invoiceDate":"2024-02-15T00:00:00","salesPrice":{"priceIncludingVat":{"value":99.95,"currencyCode":"EUR"},"vatDetail":{"rate":21},"deductions":[{"type":3,"amount":{"value":4.50,"currencyCode":"EUR"}},{"type":1,"amount":{"value":20.00,"currencyCode":"EUR"},"name":"Apple Pay fee"},{"type":1,"amount":{"value":0.60,"currencyCode":"EUR"},"name":"1% discount"}]},"salesChannel":[]}
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
               }
             }
           },
-          "400": {
-            "description": "The follow error codes may be returned:\n| Type | Details  | Notes/Possible Solutions |\n| --------| ------- |------- |\n| OutOfStockError | The requested SKU is out of stock. | Request the publisher to add stock and try again later. |\n| ValidationError | Unknown product | A product for the requested productId does not exist. |\n| ValidationError | Unknown region | A region for the requested regionId does not exist. |\n| ValidationError | Ordering of product not allowed | The publisher has either not provided access to the product or the region of the product. Request the publisher to provide access. |\n| ValidationError | Name must be provided for Other deductions. | Name is required for deductions which have the type Other. |\n| ValidationError | Name must not be provided for non-Other type deductions. | A name was provided for a deduction which does not have the type Other. Remove the name for this deduction and try again. |\n| ValidationError | Only one of the VAT details can be provided. | More than one of the VAT details was provided. |\n| https://tools.ietf.org/html/rfc9110#section-15.5.1 | One or more validation errors occurred | The request was invalid, and no further processing occurred. A list of errors will be provided, detailing the issues with the request. Common causes include missing required fields, incorrect data types, or failed additional validations. |",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Order/reportOrder": {
-      "post": {
-        "tags": [
-          "Order v2.0"
-        ],
-        "summary": "Report an order, where the key was not provided by this API.",
-        "description": "Available products can be retrieved using the GET Product endpoint.\n            \nCurrency codes can't be mixed in a single order.\nMost fields in the MissionControl.Application.Sales.Dto.Partner.SalesPriceRequest are required, with a few exceptions:\n- VatDetail: Only one of its properties—Rate, Amount or PriceExcludingVat should be set explicitly. If more than one is provided, the system will raise a validation error. The remaining properties will be calculated automatically based on the value provided.\n- Sales channel: This is optional. If the key is sold directly to the end consumer, the sales channel can remain empty. However, if intermediaries are involved, their partner IDs must be listed in the correct order of distribution.\n- Deductions: This field is also optional. It can be used to record various fees, commissions, or discounts that may have affected the final sale amount.",
-        "parameters": [
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReportOrderRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReportOrderRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReportOrderRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The follow error codes may be returned:\n| Type | Details  | Notes/Possible Solutions |\n| --------| ------- |------- |        \n| ValidationError | Unknown product | A product for the requested productId does not exist. |        \n| ValidationError | Ordering of product not allowed | The publisher has either not provided access to the product or the region of the product. Request the publisher to provide access. |\n| ValidationError | Name must be provided for Other deductions. | Name is required for deductions which have the type Other. |\n| ValidationError | Name must not be provided for non-Other type deductions. | A name was provided for a deduction which does not have the type Other. Remove the name for this deduction and try again. |\n| ValidationError | Only one of the VAT details can be provided. | More than one of the VAT details was provided.  |\n| https://tools.ietf.org/html/rfc9110#section-15.5.1 | One or more validation errors occurred | The request was invalid, and no further processing occurred. A list of errors will be provided, detailing the issues with the request. Common causes include missing required fields, incorrect data types, or failed additional validations. |",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Order/claimReservation/{reservationId}": {
-      "post": {
-        "tags": [
-          "Order v2.0"
-        ],
-        "summary": "Claims a reservation and creates an order based on it",
-        "description": "A reservation must first be created using `POST /Reservation`.  \nOnce claimed, the reservation is finalized into an order and can no longer be reused.",
-        "parameters": [
-          {
-            "name": "reservationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ClaimReservationRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ClaimReservationRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ClaimReservationRequest"
-              }
-            }
-          }
+          "required": true
         },
         "responses": {
           "200": {
@@ -361,17 +62,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -381,17 +72,160 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Order/reportOrder": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Report an order, where the key was not provided by this API.",
+        "description": "Available products can be retrieved using the GET Product endpoint.\n\nCurrency codes can't be mixed in a single order.\nMost fields in the SalesPriceRequest are required, with a few exceptions:\n- VatDetail: Only one of its properties—Rate, Amount or PriceExcludingVat should be set explicitly. If more than one is provided, the system will raise a validation error. The remaining properties will be calculated automatically based on the value provided.\n- Sales channel: This is optional. If the key is sold directly to the end consumer, the sales channel can remain empty. However, if intermediaries are involved, their partner IDs must be listed in the correct order of distribution.\n- Deductions: This field is also optional. It can be used to record various fees, commissions, or discounts that may have affected the final sale amount.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportOrderRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportOrderRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
               },
               "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Order/claimReservation/{reservationId}": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Claims a reservation and creates an order based on it",
+        "description": "A reservation must first be created using `POST /Reservation`.  \nOnce claimed, the reservation is finalized into an order and can no longer be reused.",
+        "parameters": [
+          {
+            "name": "reservationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimReservationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimReservationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimReservationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -404,7 +238,7 @@
     "/Order": {
       "get": {
         "tags": [
-          "Order v2.0"
+          "Order"
         ],
         "summary": "Retrieves a list of previously created orders. The result does not include details about the key.",
         "description": "Note 1: For performance reasons, there is a slight delay in the visibility of orders after they are created. \nNote 2: This endpoint uses pagination by default, meaning it may not return all orders in a single response. Please refer to pagination details for handling result sets.",
@@ -460,15 +294,6 @@
               "type": "integer",
               "format": "int32"
             }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -495,17 +320,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -515,17 +330,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -538,21 +343,10 @@
     "/Order/cancelOrder": {
       "post": {
         "tags": [
-          "Order v2.0"
+          "Order"
         ],
         "summary": "Cancels a previously created order in case of an error between your system and Mission Control.",
-        "description": "Typically only works very shortly after placing the order.\nDepending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.\n            \nUse this API if there is an issue with the order right after placing it, for example:\nThere was a client timeout.\nYour system failed to process the response from the Create Order endpoint.\nMission Control returned a 5xx error.\n\nThe order is identified by the original request ID that was provided when creating the order.",
-        "parameters": [
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "description": "Typically only works very shortly after placing the order.\nDepending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.\n\nUse this API if there is an issue with the order right after placing it, for example:\nThere was a client timeout.\nYour system failed to process the response from the Create Order endpoint.\nMission Control returned a 5xx error.\n\nThe order is identified by the original request ID that was provided when creating the order.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -570,7 +364,8 @@
                 "$ref": "#/components/schemas/CancelOrderRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -594,19 +389,9 @@
             }
           },
           "400": {
-            "description": "The follow error codes may be returned:\n| Type | Details  | Notes/Possible Solutions |\n| --------| ------- |------- |\n| NotFoundError | Order not found | An order with the specified request ID does not exist. |\n| ValidationError | Order cannot be cancelled | The order is not eligible for cancellation (e.g., too much time has passed since creation, or the order has already been fulfilled/cancelled). |\n| https://tools.ietf.org/html/rfc9110#section-15.5.1 | One or more validation errors occurred | The request was invalid, and no further processing occurred. A list of errors will be provided, detailing the issues with the request. Common causes include missing required fields or incorrect data types. |",
+            "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -616,17 +401,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -639,7 +414,7 @@
     "/Partner": {
       "get": {
         "tags": [
-          "Partner v2.0"
+          "Partner"
         ],
         "summary": "Retrieves a paginated list of all available partners.\nUse pagination parameters to specify the page\nsize and the current page number to retrieve the desired subset of partners.",
         "parameters": [
@@ -658,20 +433,11 @@
               "type": "integer",
               "format": "int32"
             }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "content": {
               "text/plain": {
                 "schema": {
@@ -693,17 +459,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -713,17 +469,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -736,7 +482,7 @@
     "/PriceList": {
       "get": {
         "tags": [
-          "PriceList v2.0"
+          "PriceList"
         ],
         "summary": "Gets a pricelist for a product.",
         "parameters": [
@@ -759,20 +505,11 @@
               "type": "string",
               "format": "uuid"
             }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "",
             "content": {
               "text/plain": {
                 "schema": {
@@ -794,17 +531,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -814,17 +541,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -837,9 +554,10 @@
     "/Product": {
       "get": {
         "tags": [
-          "Product v2.0"
+          "Product"
         ],
         "summary": "Retrieves all products available.",
+        "description": "Each product includes allowedCountries: the ISO 3166-1 alpha-2 country codes where your partner account may sell it.\nUse the product's id as productId and the consumer's country as countryCode when ordering, checking stock, or reserving a key.\nallowedRegions remains available for explicit region selection.",
         "parameters": [
           {
             "name": "PublisherId",
@@ -886,7 +604,7 @@
           {
             "name": "IncludeMsrp",
             "in": "query",
-            "description": "Optional flag to include MSRP information in the response.\nWhen true and MissionControl.Application.Products.Dto.Partner.GetProductsRequest.CountryCode is provided, MSRP for the specified country will be included for each product if configured.\nThis property is only effective when MissionControl.Application.Products.Dto.Partner.GetProductsRequest.CountryCode is also specified.\nDefault is false.",
+            "description": "Optional flag to include MSRP information in the response.\nWhen true and string? GetProductsRequest.CountryCode is provided, MSRP for the specified country will be included for each product if configured.\nThis property is only effective when string? GetProductsRequest.CountryCode is also specified.\nDefault is false.",
             "schema": {
               "type": "boolean"
             }
@@ -905,15 +623,6 @@
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -944,7 +653,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "A filtered list of products available.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -966,6 +675,88 @@
           "400": {
             "description": "Bad Request",
             "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Product/{productId}/redemptionInstructions": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Retrieves redemption instructions for a product before placing an order.",
+        "description": "Only products available in your partner catalog can be requested. Returns all available languageCode\nand plain-text instruction pairs. Returns an empty list when no instructions are assigned.",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "The product ID returned by GET Product.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All available translations, or an empty list if no instructions exist.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RedemptionInstruction"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RedemptionInstruction"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RedemptionInstruction"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The product is unavailable to your partner account.",
+            "content": {
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
@@ -986,17 +777,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1009,20 +790,10 @@
     "/Product/hasStock": {
       "post": {
         "tags": [
-          "Product v2.0"
+          "Product"
         ],
         "summary": "Checks if a product has stock.",
-        "parameters": [
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "description": "Supply productId and countryCode (ISO 3166-1 alpha-2). Mission:Control resolves an allowed region automatically.\nFor explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1040,7 +811,8 @@
                 "$ref": "#/components/schemas/HasStockRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -1066,17 +838,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1086,17 +848,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1109,7 +861,7 @@
     "/Publisher": {
       "get": {
         "tags": [
-          "Publisher v2.0"
+          "Publisher"
         ],
         "summary": "Retrieves a list of all publishers associated with the partner.",
         "description": "Note: This endpoint uses pagination by default, meaning it may not return all publishers in a single response if the partner has many publishers assigned. Please refer to pagination details for handling large result sets.",
@@ -1129,20 +881,11 @@
               "type": "integer",
               "format": "int32"
             }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "A paginated list of publisher entities.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1164,17 +907,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1184,17 +917,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1207,9 +930,9 @@
     "/Region": {
       "get": {
         "tags": [
-          "Region v2.0"
+          "Region"
         ],
-        "summary": "Returns a list of all regions associated with the publisher. Note: This list includes all regions defined by the publisher, which may include regions where you are not authorized to purchase products.",
+        "summary": "Returns a list of all regions associated with the publisher. Note: This list includes all regions defined by the publisher, which may include regions where you are not authorized to purchase products.\nUse this endpoint for explicit region selection. For country-based ordering, use GET Product's allowedCountries and send countryCode; no region lookup is needed.",
         "description": "Note: This endpoint uses pagination by default, so not all regions may be returned in a single response. Please refer to pagination details for managing large result sets.",
         "parameters": [
           {
@@ -1246,20 +969,11 @@
               "type": "boolean",
               "default": false
             }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "A paginated list of region entities.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1281,17 +995,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1301,17 +1005,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1324,21 +1018,10 @@
     "/Reservation": {
       "post": {
         "tags": [
-          "Reservation v2.0"
+          "Reservation"
         ],
         "summary": "Reserve a key. Can only be used for a product that has 'CanBeReserved' set to true.",
-        "description": "Creates a reservation that later can be redeemed to create an order.\nUse this endpoint to temporarily reserve items before confirming them as an order.  \nThe returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.",
-        "parameters": [
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "description": "Creates a reservation that later can be redeemed to create an order.\nSupply productId and countryCode (ISO 3166-1 alpha-2). GET Product returns the product's allowedCountries.\nFor explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.\nUse this endpoint to temporarily reserve items before confirming them as an order.  \nThe returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1356,7 +1039,8 @@
                 "$ref": "#/components/schemas/CreateReservationRequest"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -1382,17 +1066,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1402,17 +1076,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1425,7 +1089,7 @@
     "/Reservation/{reservationId}/cancel": {
       "post": {
         "tags": [
-          "Reservation v2.0"
+          "Reservation"
         ],
         "summary": "Cancels an existing reservation",
         "description": "Once canceled, the reservation can no longer be redeemed to create an order.  \nThis is useful if the customer does not complete the purchase or abandons the checkout process.",
@@ -1439,15 +1103,6 @@
               "type": "string",
               "format": "uuid"
             }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -1474,17 +1129,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1494,17 +1139,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1517,7 +1152,7 @@
     "/Reservation/{reservationId}": {
       "get": {
         "tags": [
-          "Reservation v2.0"
+          "Reservation"
         ],
         "summary": "Gets a reservation by id",
         "parameters": [
@@ -1528,15 +1163,6 @@
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "X-Partner-Id",
-            "in": "header",
-            "description": "This header is used to indicate which partner is performing the request.",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1564,17 +1190,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1584,17 +1200,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1617,12 +1223,11 @@
           "archivedOnUtc": {
             "type": "string",
             "description": "When the entity was archived",
-            "format": "date-time",
-            "nullable": true
+            "format": "date-time"
           }
         },
-        "additionalProperties": false,
-        "description": "Represents the archiving status and metadata of an entity."
+        "description": "Represents the archiving status and metadata of an entity.",
+        "additionalProperties": false
       },
       "Browser": {
         "type": "object",
@@ -1630,18 +1235,16 @@
           "userAgent": {
             "type": "string",
             "description": "The value of the User-Agent header sent by the consumer's browser.",
-            "nullable": true,
             "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
           },
           "acceptLanguage": {
             "type": "string",
             "description": "The value of the Accept-Language header sent by the consumer's browser.",
-            "nullable": true,
             "example": "en-US,en;q=0.9,sq;q=0.8"
           }
         },
-        "additionalProperties": false,
-        "description": "Browser information of the end consumer that placed the order"
+        "description": "Browser information of the end consumer that placed the order",
+        "additionalProperties": false
       },
       "CancelOrderRequest": {
         "required": [
@@ -1652,18 +1255,19 @@
           "originalRequestId": {
             "type": "string",
             "description": "Request id used when creating the order.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "d5f0c2a4-6b1e-4c8f-9a3d-2e7b1f4c8a60"
           }
         },
-        "additionalProperties": false,
-        "description": "Request to cancel an order."
+        "description": "Request to cancel an order.",
+        "additionalProperties": false
       },
       "ClaimReservationRequest": {
         "required": [
-          "endConsumer",
-          "invoiceDate",
-          "partnerReference",
           "requestId",
+          "endConsumer",
+          "partnerReference",
+          "invoiceDate",
           "salesPrice"
         ],
         "type": "object",
@@ -1671,9 +1275,11 @@
           "requestId": {
             "type": "string",
             "description": "Uniquely identifies this request. Must be unique for each request you make. In case of errors, can be used for resolving.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "d5f0c2a4-6b1e-4c8f-9a3d-2e7b1f4c8a60"
           },
           "endConsumer": {
+            "description": "The consumer who buys the key, i.e. a person.",
             "$ref": "#/components/schemas/Consumer"
           },
           "partnerReference": {
@@ -1690,6 +1296,7 @@
             "example": "2024-02-15T00:00:00"
           },
           "salesPrice": {
+            "description": "Pricing details of the key to buy.",
             "$ref": "#/components/schemas/SalesPriceRequest"
           },
           "salesChannel": {
@@ -1698,53 +1305,52 @@
               "type": "string",
               "format": "uuid"
             },
-            "description": "An ordered list of partner IDs representing the sales channel through which the key is transferred\non its way to the end consumer. Each ID in the list corresponds to a partner involved\nin the distribution process, and the order of the list reflects the sequence in which the key passes\nthrough the partners.\n            \nIf the actor sells the key directly to the end consumer, this list can be empty. However, if the actor\nis a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exact\norder that the key moves through them before reaching the consumer.",
-            "nullable": true,
+            "description": "An ordered list of partner IDs representing the sales channel through which the key is transferred\non its way to the end consumer. Each ID in the list corresponds to a partner involved\nin the distribution process, and the order of the list reflects the sequence in which the key passes\nthrough the partners.\n\nIf the actor sells the key directly to the end consumer, this list can be empty. However, if the actor\nis a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exact\norder that the key moves through them before reaching the consumer.",
             "example": [
               "545a9add-aff7-4a35-b646-8edd04ac9496",
               "3964cdbe-e414-435f-90ec-e295f2388516"
             ]
           }
         },
-        "additionalProperties": false,
-        "description": "Request to send when claiming a reservation"
+        "description": "Request to send when claiming a reservation",
+        "additionalProperties": false
       },
       "Consumer": {
         "required": [
-          "browser",
           "ipAddress",
-          "location"
+          "location",
+          "browser"
         ],
         "type": "object",
         "properties": {
           "ipAddress": {
-            "minLength": 1,
             "type": "string",
             "description": "IP-address of the consumer the key will be delivered to.",
             "example": "62.163.212.228"
           },
           "location": {
+            "description": "Location of the consumer.",
             "$ref": "#/components/schemas/Location"
           },
           "browser": {
+            "description": "Browser information of the consumer that placed the order.",
             "$ref": "#/components/schemas/Browser"
           },
           "language": {
             "type": "string",
-            "description": "The language preference of the end consumer (e.g., \"en-US\", \"nl-NL\", \"en\").\nRedemption instructions will be returned in the specified language if available, or in a suitable fallback language if not.",
-            "nullable": true
+            "description": "The language preference of the end consumer (e.g., \"en-US\", \"nl-NL\", \"en\").\nRedemption instructions will be returned in the specified language if available, or in a suitable fallback language if not."
           }
         },
-        "additionalProperties": false,
-        "description": "Represents the end consumer who buys a key."
+        "description": "Represents the end consumer who buys a key.",
+        "additionalProperties": false
       },
       "CreateOrderRequest": {
         "required": [
-          "endConsumer",
-          "invoiceDate",
-          "partnerReference",
-          "productId",
           "requestId",
+          "productId",
+          "endConsumer",
+          "partnerReference",
+          "invoiceDate",
           "salesPrice"
         ],
         "type": "object",
@@ -1752,42 +1358,51 @@
           "requestId": {
             "type": "string",
             "description": "Uniquely identifies this request. Must be unique for each request you make. In case of errors, can be used for resolving.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "d5f0c2a4-6b1e-4c8f-9a3d-2e7b1f4c8a60"
           },
           "productId": {
             "type": "string",
             "description": "Unique identifier of the product to buy.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
           },
           "regionId": {
             "type": "string",
-            "description": "The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.",
-            "format": "uuid",
-            "nullable": true
+            "description": "Alternative to CountryCode for explicit region selection. Supply exactly one of RegionId and CountryCode.",
+            "format": "uuid"
           },
           "countryCode": {
             "maxLength": 2,
             "minLength": 2,
             "type": "string",
-            "description": "The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.",
-            "nullable": true
+            "description": "Recommended: the consumer's ISO 3166-1 alpha-2 country code, chosen from the product's allowedCountries.\nMission:Control resolves an allowed region automatically. Supply exactly one of CountryCode and RegionId.",
+            "example": "NL"
           },
           "endConsumer": {
+            "description": "The consumer who buys the key.",
             "$ref": "#/components/schemas/Consumer"
           },
           "partnerReference": {
             "maxLength": 64,
             "minLength": 1,
             "type": "string",
-            "description": "Reference of the transaction in the partner's system."
+            "description": "Reference of the transaction in the partner's system.",
+            "example": "ORDER-45123"
           },
           "invoiceDate": {
             "type": "string",
             "description": "The date the consumer placed the order for a key.",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2024-02-15T00:00:00"
           },
           "salesPrice": {
+            "description": "Pricing details of the key to buy.",
             "$ref": "#/components/schemas/SalesPriceRequest"
+          },
+          "productValue": {
+            "description": "If this product has value type 'variable' the value of the product must be provided here. This is used for gift cards and top ups. The card will have the value provided here.\nIf this product has value type 'fixed', this field should not be provided.",
+            "$ref": "#/components/schemas/Money"
           },
           "salesChannel": {
             "type": "array",
@@ -1795,12 +1410,12 @@
               "type": "string",
               "format": "uuid"
             },
-            "description": "An ordered list of partner IDs representing the sales channel through which the key is transferred\non its way to the end consumer. Each ID in the list corresponds to a partner involved\nin the distribution process, and the order of the list reflects the sequence in which the key passes\nthrough the partners.\n            \nIf the actor sells the key directly to the end consumer, this list can be empty. However, if the actor\nis a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exact\norder that the key moves through them before reaching the consumer.",
-            "nullable": true
+            "description": "An ordered list of partner IDs representing the sales channel through which the key is transferred\non its way to the end consumer. Each ID in the list corresponds to a partner involved\nin the distribution process, and the order of the list reflects the sequence in which the key passes\nthrough the partners.\n\nIf the actor sells the key directly to the end consumer, this list can be empty. However, if the actor\nis a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exact\norder that the key moves through them before reaching the consumer.",
+            "example": []
           }
         },
-        "additionalProperties": false,
-        "description": "Request to create an order for buying a key."
+        "description": "Request to create an order for buying a key.",
+        "additionalProperties": false
       },
       "CreateReservationRequest": {
         "required": [
@@ -1816,51 +1431,47 @@
           },
           "regionId": {
             "type": "string",
-            "description": "The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.",
-            "format": "uuid",
-            "nullable": true
+            "description": "Alternative to CountryCode for explicit region selection. Supply exactly one of RegionId and CountryCode.",
+            "format": "uuid"
           },
           "countryCode": {
             "maxLength": 2,
             "minLength": 2,
             "type": "string",
-            "description": "The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.",
-            "nullable": true
+            "description": "Recommended: the consumer's ISO 3166-1 alpha-2 country code, chosen from the product's allowedCountries.\nMission:Control resolves an allowed region automatically. Supply exactly one of CountryCode and RegionId.",
+            "example": "NL"
           }
         },
-        "additionalProperties": false,
-        "description": "Request to send to create a reservation."
+        "description": "Request to send to create a reservation.",
+        "additionalProperties": false
       },
       "Deduction": {
         "required": [
-          "amount",
-          "type"
+          "type",
+          "amount"
         ],
         "type": "object",
         "properties": {
           "type": {
-            "enum": [
-              1,
-              2,
-              3
-            ],
             "type": "integer",
-            "description": "The type of the deduction. Possible values are:\n1 = \"Other\", 2 = \"PaymentFee\", and 3 = \"AffiliateFee\".\nThe deduction type defines the nature of the fee or discount.\nIf the type is set to Other, a custom Name must be provided.",
             "format": "int32",
-            "example": 1
+            "description": "The type of the deduction. Possible values are:\n1 = \"Other\", 2 = \"PaymentFee\", and 3 = \"AffiliateFee\".\nThe deduction type defines the nature of the fee or discount.\nIf the type is set to Other, a custom Name must be provided.",
+            "examples": [
+              1
+            ]
           },
           "amount": {
+            "description": "The monetary value of the deduction.\nThis represents the actual amount deducted from or added to the sale.",
             "$ref": "#/components/schemas/Money"
           },
           "name": {
             "type": "string",
-            "description": "The name or description of the deduction.\nThis is only required when the deduction type is MissionControl.Domain.Sales.Values.DeductionType.Other.\nIt allows you to specify a custom deduction that does not fit into predefined categories.",
-            "nullable": true,
+            "description": "The name or description of the deduction.\nThis is only required when the deduction type is DeductionType.Other.\nIt allows you to specify a custom deduction that does not fit into predefined categories.",
             "example": "Apple Pay fee"
           }
         },
-        "additionalProperties": false,
-        "description": "Represents a deduction applied to a sale, such as a fee or discount.\nA deduction can reduce the total sale amount or represent an additional charge,\ndepending on the type. Common examples include payment fees, affiliate fees, or promotional discounts."
+        "description": "Represents a deduction applied to a sale, such as a fee or discount.\nA deduction can reduce the total sale amount or represent an additional charge,\ndepending on the type. Common examples include payment fees, affiliate fees, or promotional discounts.",
+        "additionalProperties": false
       },
       "HasStockRequest": {
         "required": [
@@ -1871,24 +1482,24 @@
           "productId": {
             "type": "string",
             "description": "Identifier of the product to buy.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
           },
           "regionId": {
             "type": "string",
-            "description": "The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.",
-            "format": "uuid",
-            "nullable": true
+            "description": "Alternative to CountryCode for explicit region selection. Supply exactly one of RegionId and CountryCode.",
+            "format": "uuid"
           },
           "countryCode": {
             "maxLength": 2,
             "minLength": 2,
             "type": "string",
-            "description": "The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.",
-            "nullable": true
+            "description": "Recommended: the consumer's ISO 3166-1 alpha-2 country code, chosen from the product's allowedCountries.\nMission:Control resolves an allowed region automatically. Supply exactly one of CountryCode and RegionId.",
+            "example": "NL"
           }
         },
-        "additionalProperties": false,
-        "description": "Request to send to check if a product has stock."
+        "description": "Request to send to check if a product has stock.",
+        "additionalProperties": false
       },
       "HasStockResponse": {
         "required": [
@@ -1901,8 +1512,8 @@
             "description": "If set to true, the product has stock. If false, the product does not have stock."
           }
         },
-        "additionalProperties": false,
-        "description": "Response to a has stock request."
+        "description": "Response to a has stock request.",
+        "additionalProperties": false
       },
       "Key": {
         "type": "object",
@@ -1910,16 +1521,16 @@
           "value": {
             "type": "string",
             "description": "Value of the key, i.e. the actual activation key. Only filled in the response to a 'buy key' API call.",
-            "nullable": true
+            "example": "AAAAA-BBBBB-CCCCC"
           },
           "reference": {
             "type": "string",
             "description": "External reference for the key. This value can be used for support purposes by the consumer, so they don't have to share the actual key.",
-            "nullable": true
+            "example": "KEY-0001234"
           }
         },
-        "additionalProperties": false,
-        "description": "An activation key for a product."
+        "description": "An activation key for a product.",
+        "additionalProperties": false
       },
       "Location": {
         "required": [
@@ -1937,23 +1548,21 @@
           "region": {
             "type": "string",
             "description": "Region of the consumer. This can be a state, province or similar.",
-            "nullable": true,
             "example": "North Holland"
           },
           "city": {
             "type": "string",
             "description": "City of the consumer.",
-            "nullable": true,
             "example": "Amsterdam"
           }
         },
-        "additionalProperties": false,
-        "description": "Location of the consumer."
+        "description": "Location of the consumer.",
+        "additionalProperties": false
       },
       "Money": {
         "required": [
-          "currencyCode",
-          "value"
+          "value",
+          "currencyCode"
         ],
         "type": "object",
         "properties": {
@@ -1964,14 +1573,13 @@
             "example": 1.99
           },
           "currencyCode": {
-            "minLength": 1,
             "type": "string",
             "description": "The three-letter ISO 4217 currency code that specifies the currency of the monetary value,\nsuch as \"USD\" for US Dollars or \"EUR\" for Euros.",
-            "example": "USD"
+            "example": "EUR"
           }
         },
-        "additionalProperties": false,
-        "description": "Represents a monetary value in a specified currency. This type encapsulates both the numeric value and the\ncurrency code, forming a complete monetary representation. It is typically used for handling prices,\nfinancial calculations, or currency-specific amounts. The Value and CurrencyCode\nproperties must be provided for this type to have a meaningful monetary representation."
+        "description": "Represents a monetary value in a specified currency. This type encapsulates both the numeric value and the\ncurrency code, forming a complete monetary representation. It is typically used for handling prices,\nfinancial calculations, or currency-specific amounts. The Value and CurrencyCode\nproperties must be provided for this type to have a meaningful monetary representation.",
+        "additionalProperties": false
       },
       "Order": {
         "type": "object",
@@ -1979,69 +1587,73 @@
           "id": {
             "type": "string",
             "description": "Unique identifier of the order.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "6f9c1e2a-4b3d-4c5e-8f7a-1b2c3d4e5f60"
           },
           "requestId": {
             "type": "string",
             "description": "Id of the request that created this order, as assigned by the partner.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "d5f0c2a4-6b1e-4c8f-9a3d-2e7b1f4c8a60"
           },
           "created": {
             "type": "string",
             "description": "Date/time this order was created.",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2024-02-15T10:30:00"
           },
           "publisherId": {
             "type": "string",
             "description": "Id of the publisher where the order was placed.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "3c9e8b7a-1d2f-4e5a-9b8c-7d6e5f4a3b21"
           },
           "partnerId": {
             "type": "string",
             "description": "Id of the partner that placed the order.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "e2a4c6b8-0d1f-4a3c-9e5b-7f9d1b3c5e70"
           },
           "partnerReference": {
             "type": "string",
             "description": "Reference provided by the partner when ordering the key.",
-            "nullable": true
+            "example": "ORDER-45123"
           },
           "key": {
+            "description": "Key sold with this order.",
             "$ref": "#/components/schemas/Key"
           },
           "msrp": {
+            "description": "The Manufacturer's Suggested Retail Price (MSRP) of the product, based on the country of the consumer at the time of the order.",
             "$ref": "#/components/schemas/Money"
           },
           "productId": {
             "type": "string",
             "description": "Id of the ordered product.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
           },
           "productName": {
             "type": "string",
             "description": "Name of the ordered product.",
-            "nullable": true
+            "example": "Example Game - Standard Edition"
           },
           "regionId": {
             "type": "string",
             "description": "Id of the region for which a key was ordered.",
             "format": "uuid",
-            "nullable": true
+            "example": "0b7e2f3a-9c4d-4e1f-8a6b-3d5c7e9f1a24"
           },
           "regionName": {
             "type": "string",
             "description": "Name of the region for which a key was ordered.",
-            "nullable": true
+            "example": "Europe"
           },
           "redemptionInstruction": {
+            "description": "Explains to the consumer how to redeem the purchased key, including any relevant URLs and instructions.",
             "$ref": "#/components/schemas/RedemptionInstruction"
           },
           "statusId": {
-            "enum": [
-              1,
-              2,
-              3
-            ],
             "type": "integer",
             "description": "Status of the order. Possible values:\n1 - Open, 2 - Fulfilled, 3 - Cancelled",
             "format": "int32"
@@ -2049,39 +1661,14 @@
           "statusText": {
             "type": "string",
             "description": "Text representation of the current status of the order, for human readability only.",
-            "nullable": true,
-            "readOnly": true
+            "example": "Open"
+          },
+          "productValue": {
+            "description": "The value of the product ordered if it was a variable value product. This is applicable for certain gift-cards and top-ups.",
+            "$ref": "#/components/schemas/Money"
           }
         },
-        "additionalProperties": false,
-        "description": "Details of an order."
-      },
-      "OrderListResult": {
-        "required": [
-          "pageCount",
-          "result",
-          "totalCount"
-        ],
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Order"
-            },
-            "readOnly": true
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "pageCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          }
-        },
+        "description": "Details of an order.",
         "additionalProperties": false
       },
       "Partner": {
@@ -2091,50 +1678,24 @@
             "type": "string",
             "description": "Unique identifier for the partner",
             "format": "uuid",
-            "readOnly": true
+            "example": "e2a4c6b8-0d1f-4a3c-9e5b-7f9d1b3c5e70"
           },
           "name": {
             "type": "string",
             "description": "Name of the partner",
-            "nullable": true,
-            "readOnly": true
+            "example": "Example Retailer"
           },
           "hubSpotUrl": {
             "type": "string",
-            "description": "Optional HubSpot url",
-            "nullable": true,
-            "readOnly": true
+            "description": "Optional HubSpot url"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "Thumbnail image of the partner",
+            "example": "https://example.com/images/partner-logo.png"
           }
         },
-        "additionalProperties": false,
-        "description": "A reseller of keys to either end consumers or other partners."
-      },
-      "PartnerListResult": {
-        "required": [
-          "pageCount",
-          "result",
-          "totalCount"
-        ],
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Partner"
-            },
-            "readOnly": true
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "pageCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          }
-        },
+        "description": "A reseller of keys to either end consumers or other partners.",
         "additionalProperties": false
       },
       "PriceList": {
@@ -2146,19 +1707,19 @@
           "productId": {
             "type": "string",
             "description": "Id of the product this list applies to.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
           },
           "prices": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PriceListItem"
             },
-            "description": "List of prices per country.",
-            "nullable": true
+            "description": "List of prices per country."
           }
         },
-        "additionalProperties": false,
-        "description": "List of prices for a product."
+        "description": "List of prices for a product.",
+        "additionalProperties": false
       },
       "PriceListItem": {
         "required": [
@@ -2169,50 +1730,46 @@
           "countryCode": {
             "type": "string",
             "description": "Country in which this price applies.",
-            "nullable": true
+            "example": "NL"
           },
           "msrp": {
+            "description": "If set, Manufacturer’s Suggested Retailer Price in this country. If null, no MSRP is available.",
             "$ref": "#/components/schemas/Money"
           }
         },
-        "additionalProperties": false,
-        "description": "Defines the price for a product in a country. If Msrp is NULL, no Msrp data is available for this country."
+        "description": "Defines the price for a product in a country. If Msrp is NULL, no Msrp data is available for this country.",
+        "additionalProperties": false
       },
       "ProblemDetails": {
         "type": "object",
         "properties": {
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "status": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           },
           "detail": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "instance": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "Product": {
         "required": [
-          "allowedRegions",
           "id",
-          "name",
+          "publisherId",
           "platformId",
           "productTypeId",
-          "publisherId"
+          "name",
+          "allowedRegions"
         ],
         "type": "object",
         "properties": {
@@ -2220,67 +1777,44 @@
             "type": "string",
             "description": "Unique identifier.",
             "format": "uuid",
-            "readOnly": true
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
           },
           "publisherId": {
             "type": "string",
             "description": "Identifier of the publisher of the product.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "3c9e8b7a-1d2f-4e5a-9b8c-7d6e5f4a3b21"
           },
           "platformId": {
-            "enum": [
-              1,
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              99
-            ],
             "type": "integer",
-            "description": "Defines values for gaming platforms.",
+            "description": "Identifier of the platform for which the keys of this product are valid. Possible values:\n1 = Steam, 2 = Xbox, 3 = PlayStation, 4 = Nintendo, 5 = Epic Games, 6 = Electronic Arts, 99 = Other",
             "format": "int32"
           },
           "platformName": {
             "type": "string",
             "description": "Human readable description of the platform. Do not use this for programmatic purposes.",
-            "nullable": true,
-            "readOnly": true
+            "example": "Steam"
           },
           "productTypeId": {
-            "enum": [
-              1,
-              2,
-              3,
-              4,
-              5,
-              6,
-              99
-            ],
             "type": "integer",
             "description": "Type of the product.",
-            "format": "int32",
-            "readOnly": true
+            "format": "int32"
           },
           "productTypeDescription": {
             "type": "string",
             "description": "Human-readable description of the product type.",
-            "nullable": true,
-            "readOnly": true
+            "example": "Game"
           },
           "name": {
             "type": "string",
             "description": "Name of the product.",
-            "nullable": true,
-            "readOnly": true
+            "example": "Example Game - Standard Edition"
           },
           "releaseDate": {
             "type": "string",
             "description": "Date the product is released.",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "example": "2024-02-15T00:00:00"
           },
           "canBeReserved": {
             "type": "boolean",
@@ -2292,42 +1826,29 @@
               "type": "string",
               "format": "uuid"
             },
-            "description": "Id's of the regions where this product is allowed.",
-            "nullable": true
+            "description": "Region IDs available for explicit region selection. For country-based ordering, use AllowedCountries instead.",
+            "example": [
+              "0b7e2f3a-9c4d-4e1f-8a6b-3d5c7e9f1a24"
+            ]
           },
-          "msrp": {
-            "$ref": "#/components/schemas/Money"
-          }
-        },
-        "additionalProperties": false,
-        "description": "A product for which activation keys are sold."
-      },
-      "ProductListResult": {
-        "required": [
-          "pageCount",
-          "result",
-          "totalCount"
-        ],
-        "type": "object",
-        "properties": {
-          "result": {
+          "allowedCountries": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Product"
+              "type": "string"
             },
-            "readOnly": true
+            "description": "Distinct ISO 3166-1 alpha-2 country codes where this partner may sell the product.\nResolved from the allowed regions returned for the request."
           },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
+          "msrp": {
+            "description": "Manufacturer's Suggested Retail Price (MSRP) for the product. This property is only populated\nwhen bool GetProductsRequest.IncludeMsrp is provided and pricing information is\navailable for the specified country. Returns null if no country code was provided or pricing\ninformation is unavailable.",
+            "$ref": "#/components/schemas/Money"
           },
-          "pageCount": {
+          "valueType": {
             "type": "integer",
-            "format": "int32",
-            "readOnly": true
+            "description": "Defines the type of value associated with the product. For example, a gift card may have a variable value, while a game key has a fixed value.",
+            "format": "int32"
           }
         },
+        "description": "A product for which activation keys are sold.",
         "additionalProperties": false
       },
       "Publisher": {
@@ -2337,50 +1858,22 @@
             "type": "string",
             "description": "Unique id of the publisher",
             "format": "uuid",
-            "readOnly": true
+            "example": "3c9e8b7a-1d2f-4e5a-9b8c-7d6e5f4a3b21"
           },
           "name": {
             "maxLength": 256,
             "minLength": 0,
             "type": "string",
             "description": "Name of the publisher",
-            "nullable": true
+            "example": "Example Publisher"
           },
           "imageUrl": {
             "type": "string",
             "description": "Image of the Publisher",
-            "nullable": true
+            "example": "https://example.com/images/publisher-logo.png"
           }
         },
-        "additionalProperties": false,
-        "description": "Company publishing digital products."
-      },
-      "PublisherListResult": {
-        "required": [
-          "pageCount",
-          "result",
-          "totalCount"
-        ],
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Publisher"
-            },
-            "readOnly": true
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "pageCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          }
-        },
+        "description": "Company publishing digital products.",
         "additionalProperties": false
       },
       "RedemptionInstruction": {
@@ -2393,23 +1886,23 @@
           "languageCode": {
             "type": "string",
             "description": "The language or culture code of the redemption instructions, e.g. \"en-US\", \"fr-FR\" or \"en\".",
-            "nullable": true
+            "example": "en-US"
           },
           "text": {
             "type": "string",
             "description": "Description of how to redeem the key, in plain text format.",
-            "nullable": true
+            "example": "Open Steam, choose Games &gt; Activate a Product on Steam and enter the key."
           }
         },
-        "additionalProperties": false,
-        "description": "Represents information about how to redeem a purchased key."
+        "description": "Represents information about how to redeem a product key.",
+        "additionalProperties": false
       },
       "Region": {
         "required": [
-          "archiveInfo",
-          "countries",
           "id",
-          "name"
+          "name",
+          "archiveInfo",
+          "countries"
         ],
         "type": "object",
         "properties": {
@@ -2417,15 +1910,15 @@
             "type": "string",
             "description": "Unique identifier for the region.",
             "format": "uuid",
-            "readOnly": true
+            "example": "0b7e2f3a-9c4d-4e1f-8a6b-3d5c7e9f1a24"
           },
           "name": {
             "type": "string",
             "description": "Name of the region.",
-            "nullable": true,
-            "readOnly": true
+            "example": "Europe"
           },
           "archiveInfo": {
+            "description": "Represents the archiving status and metadata of an entity.",
             "$ref": "#/components/schemas/ArchivingInfo"
           },
           "countries": {
@@ -2434,49 +1927,24 @@
               "type": "string"
             },
             "description": "ISO 3166-1 alpha-2 country codes that are part of the region. Please be aware that multiple regions can have the same country code, they are not mutally exclusive.",
-            "nullable": true,
-            "readOnly": true
+            "example": [
+              "NL",
+              "DE",
+              "FR"
+            ]
           }
         },
-        "additionalProperties": false,
-        "description": "A region in which keys can be sold."
-      },
-      "RegionListResult": {
-        "required": [
-          "pageCount",
-          "result",
-          "totalCount"
-        ],
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Region"
-            },
-            "readOnly": true
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "pageCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          }
-        },
+        "description": "A region in which keys can be sold.",
         "additionalProperties": false
       },
       "ReportOrderRequest": {
         "required": [
-          "endConsumer",
-          "invoiceDate",
-          "partnerReference",
+          "requestId",
           "productId",
           "regionId",
-          "requestId",
+          "endConsumer",
+          "partnerReference",
+          "invoiceDate",
           "salesPrice"
         ],
         "type": "object",
@@ -2484,33 +1952,40 @@
           "requestId": {
             "type": "string",
             "description": "Uniquely identifies this request. Must be unique for each request you make. In case of errors, can be used for resolving.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "d5f0c2a4-6b1e-4c8f-9a3d-2e7b1f4c8a60"
           },
           "productId": {
             "type": "string",
             "description": "Unique Identifier of the product sold.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
           },
           "regionId": {
             "type": "string",
             "description": "Unique identifier of the region in which the sold key is valid.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "0b7e2f3a-9c4d-4e1f-8a6b-3d5c7e9f1a24"
           },
           "endConsumer": {
+            "description": "The consumer who bought the key, i.e. a person.",
             "$ref": "#/components/schemas/Consumer"
           },
           "partnerReference": {
             "maxLength": 64,
             "minLength": 1,
             "type": "string",
-            "description": "Reference of the transaction in the partner's system."
+            "description": "Reference of the transaction in the partner's system.",
+            "example": "ORDER-45123"
           },
           "invoiceDate": {
             "type": "string",
             "description": "The date the consumer placed the order for a key.",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2024-02-15T00:00:00"
           },
           "salesPrice": {
+            "description": "Pricing details of the sold key.",
             "$ref": "#/components/schemas/SalesPriceRequest"
           },
           "salesChannel": {
@@ -2519,12 +1994,12 @@
               "type": "string",
               "format": "uuid"
             },
-            "description": "An ordered list of partner IDs representing the sales channel through which the key is transferred\non its way to the end consumer. Each ID in the list corresponds to a partner involved\nin the distribution process, and the order of the list reflects the sequence in which the key passes\nthrough the partners.\n            \nIf the actor sells the key directly to the end consumer, this list can be empty. However, if the actor\nis a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exact\norder that the key moves through them before reaching the consumer.",
-            "nullable": true
+            "description": "An ordered list of partner IDs representing the sales channel through which the key is transferred\non its way to the end consumer. Each ID in the list corresponds to a partner involved\nin the distribution process, and the order of the list reflects the sequence in which the key passes\nthrough the partners.\n\nIf the actor sells the key directly to the end consumer, this list can be empty. However, if the actor\nis a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exact\norder that the key moves through them before reaching the consumer.",
+            "example": []
           }
         },
-        "additionalProperties": false,
-        "description": "Request to send when reporting an order. No key will be delivered by this API."
+        "description": "Request to send when reporting an order. No key will be delivered by this API.",
+        "additionalProperties": false
       },
       "Reservation": {
         "type": "object",
@@ -2532,15 +2007,10 @@
           "id": {
             "type": "string",
             "description": "Unique identifier of the reservation.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
           },
           "statusId": {
-            "enum": [
-              1,
-              2,
-              3,
-              4
-            ],
             "type": "integer",
             "description": "Id of the status of the reservation. Possible values:\n1 = AwaitingClaim\n2 = Claimed\n3 = Cancelled\n4 = Expired",
             "format": "int32"
@@ -2548,17 +2018,17 @@
           "statusDescription": {
             "type": "string",
             "description": "Human readable description of the status. Do not use this for programmatic purposes.",
-            "nullable": true,
-            "readOnly": true
+            "example": "AwaitingClaim"
           },
           "expires": {
             "type": "string",
             "description": "Date/time when the reservation expires and cannot be claimed.",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2024-02-15T10:45:00"
           }
         },
-        "additionalProperties": false,
-        "description": "Reservation for a product's key."
+        "description": "Reservation for a product's key.",
+        "additionalProperties": false
       },
       "SalesPriceRequest": {
         "required": [
@@ -2568,9 +2038,11 @@
         "type": "object",
         "properties": {
           "priceIncludingVat": {
+            "description": "The final price the consumer paid for the key.",
             "$ref": "#/components/schemas/Money"
           },
           "vatDetail": {
+            "description": "VAT details of the sales price.",
             "$ref": "#/components/schemas/VatDetail"
           },
           "deductions": {
@@ -2578,12 +2050,11 @@
             "items": {
               "$ref": "#/components/schemas/Deduction"
             },
-            "description": "A list of common deductions that occurred during the sale.\nThese deductions may include various fees or discounts applied to the sale, such as payment processing fees,\naffiliate commissions, or other adjustments.\nUse this collection to register any additional charges or reductions that affect the final sale amount.",
-            "nullable": true
+            "description": "A list of common deductions that occurred during the sale.\nThese deductions may include various fees or discounts applied to the sale, such as payment processing fees,\naffiliate commissions, or other adjustments.\nUse this collection to register any additional charges or reductions that affect the final sale amount."
           }
         },
-        "additionalProperties": false,
-        "description": "Represents a sales price including VAT details. Both the price and VAT details are required. One and only one of the VAT details must be set."
+        "description": "Represents a sales price including VAT details. Both the price and VAT details are required. One and only one of the VAT details must be set.",
+        "additionalProperties": false
       },
       "VatDetail": {
         "type": "object",
@@ -2592,30 +2063,199 @@
             "type": "number",
             "description": "The VAT rate as a percentage (e.g., 20.5 for a 20.5% VAT rate).",
             "format": "double",
-            "nullable": true,
             "example": 20.5
           },
           "amount": {
+            "description": "The VAT amount, representing the monetary value of the VAT.",
             "$ref": "#/components/schemas/Money"
           },
           "priceExcludingVat": {
+            "description": "The sales price before VAT is applied.",
             "$ref": "#/components/schemas/Money"
           }
         },
-        "additionalProperties": false,
-        "description": "Represents the VAT (Value Added Tax) details associated with a sales price.\nThe MissionControl.Application.Sales.Dto.Partner.VatDetail.Rate, MissionControl.Application.Sales.Dto.Partner.VatDetail.Amount, and MissionControl.Application.Sales.Dto.Partner.VatDetail.PriceExcludingVat properties are interdependent.\nWhen one of these properties is provided, the other two will be automatically calculated.\nOnly one property should be set explicitly in any given request; setting more than one will result in a validation error."
+        "description": "Represents the VAT (Value Added Tax) details associated with a sales price.\nThe decimal? VatDetail.Rate, Money? VatDetail.Amount, and Money? VatDetail.PriceExcludingVat properties are interdependent.\nWhen one of these properties is provided, the other two will be automatically calculated.\nOnly one property should be set explicitly in any given request; setting more than one will result in a validation error.",
+        "additionalProperties": false
+      },
+      "OrderListResult": {
+        "required": [
+          "result",
+          "totalCount",
+          "pageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "PartnerListResult": {
+        "required": [
+          "result",
+          "totalCount",
+          "pageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Partner"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductListResult": {
+        "required": [
+          "result",
+          "totalCount",
+          "pageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "PublisherListResult": {
+        "required": [
+          "result",
+          "totalCount",
+          "pageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Publisher"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegionListResult": {
+        "required": [
+          "result",
+          "totalCount",
+          "pageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Region"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "scheme": "Bearer"
+        "scheme": "bearer",
+        "bearerFormat": "Json Web Token"
+      },
+      "XPartnerId": {
+        "type": "apiKey",
+        "description": "Partner identifier",
+        "name": "X-Partner-Id",
+        "in": "header"
       }
     }
   },
   "security": [
     {
-      "Bearer": [ ]
+      "Bearer": []
+    },
+    {
+      "XPartnerId": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Order"
+    },
+    {
+      "name": "Partner"
+    },
+    {
+      "name": "PriceList"
+    },
+    {
+      "name": "Product"
+    },
+    {
+      "name": "Publisher"
+    },
+    {
+      "name": "Region"
+    },
+    {
+      "name": "Reservation"
     }
   ]
 }

@@ -18,7 +18,7 @@ export interface ArchivingInfo extends Parsable {
     isArchived?: boolean | null;
 }
 /**
- * Browser information of the end consumer that placed the order
+ * Browser information of the consumer that placed the order.
  */
 export interface Browser extends Parsable {
     /**
@@ -44,7 +44,7 @@ export interface CancelOrderRequest extends Parsable {
  */
 export interface ClaimReservationRequest extends Parsable {
     /**
-     * Represents the end consumer who buys a key.
+     * The consumer who buys the key, i.e. a person.
      */
     endConsumer?: Consumer | null;
     /**
@@ -60,20 +60,20 @@ export interface ClaimReservationRequest extends Parsable {
      */
     requestId?: Guid | null;
     /**
-     * An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.            If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.
+     * An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.
      */
     salesChannel?: Guid[] | null;
     /**
-     * Represents a sales price including VAT details. Both the price and VAT details are required. One and only one of the VAT details must be set.
+     * Pricing details of the key to buy.
      */
     salesPrice?: SalesPriceRequest | null;
 }
 /**
- * Represents the end consumer who buys a key.
+ * The consumer who buys the key.
  */
 export interface Consumer extends Parsable {
     /**
-     * Browser information of the end consumer that placed the order
+     * Browser information of the consumer that placed the order.
      */
     browser?: Browser | null;
     /**
@@ -229,11 +229,11 @@ export function createOrderListResultFromDiscriminatorValue(parseNode: ParseNode
  */
 export interface CreateOrderRequest extends Parsable {
     /**
-     * The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.
+     * Recommended: the consumer's ISO 3166-1 alpha-2 country code, chosen from the product's allowedCountries.Mission:Control resolves an allowed region automatically. Supply exactly one of CountryCode and RegionId.
      */
     countryCode?: string | null;
     /**
-     * Represents the end consumer who buys a key.
+     * The consumer who buys the key.
      */
     endConsumer?: Consumer | null;
     /**
@@ -249,7 +249,11 @@ export interface CreateOrderRequest extends Parsable {
      */
     productId?: Guid | null;
     /**
-     * The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.
+     * If this product has value type 'variable' the value of the product must be provided here. This is used for gift cards and top ups. The card will have the value provided here.If this product has value type 'fixed', this field should not be provided.
+     */
+    productValue?: Money | null;
+    /**
+     * Alternative to CountryCode for explicit region selection. Supply exactly one of RegionId and CountryCode.
      */
     regionId?: Guid | null;
     /**
@@ -257,11 +261,11 @@ export interface CreateOrderRequest extends Parsable {
      */
     requestId?: Guid | null;
     /**
-     * An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.            If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.
+     * An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.
      */
     salesChannel?: Guid[] | null;
     /**
-     * Represents a sales price including VAT details. Both the price and VAT details are required. One and only one of the VAT details must be set.
+     * Pricing details of the key to buy.
      */
     salesPrice?: SalesPriceRequest | null;
 }
@@ -396,7 +400,7 @@ export function createReservationFromDiscriminatorValue(parseNode: ParseNode | u
  */
 export interface CreateReservationRequest extends Parsable {
     /**
-     * The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.
+     * Recommended: the consumer's ISO 3166-1 alpha-2 country code, chosen from the product's allowedCountries.Mission:Control resolves an allowed region automatically. Supply exactly one of CountryCode and RegionId.
      */
     countryCode?: string | null;
     /**
@@ -404,7 +408,7 @@ export interface CreateReservationRequest extends Parsable {
      */
     productId?: Guid | null;
     /**
-     * The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.
+     * Alternative to CountryCode for explicit region selection. Supply exactly one of RegionId and CountryCode.
      */
     regionId?: Guid | null;
 }
@@ -431,11 +435,11 @@ export function createVatDetailFromDiscriminatorValue(parseNode: ParseNode | und
  */
 export interface Deduction extends Parsable {
     /**
-     * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+     * The monetary value of the deduction.This represents the actual amount deducted from or added to the sale.
      */
     amount?: Money | null;
     /**
-     * The name or description of the deduction.This is only required when the deduction type is MissionControl.Domain.Sales.Values.DeductionType.Other.It allows you to specify a custom deduction that does not fit into predefined categories.
+     * The name or description of the deduction.This is only required when the deduction type is DeductionType.Other.It allows you to specify a custom deduction that does not fit into predefined categories.
      */
     name?: string | null;
     /**
@@ -521,6 +525,7 @@ export function deserializeIntoCreateOrderRequest(createOrderRequest: Partial<Cr
         "invoiceDate": n => { createOrderRequest.invoiceDate = n.getDateValue(); },
         "partnerReference": n => { createOrderRequest.partnerReference = n.getStringValue(); },
         "productId": n => { createOrderRequest.productId = n.getGuidValue(); },
+        "productValue": n => { createOrderRequest.productValue = n.getObjectValue<Money>(createMoneyFromDiscriminatorValue); },
         "regionId": n => { createOrderRequest.regionId = n.getGuidValue(); },
         "requestId": n => { createOrderRequest.requestId = n.getGuidValue(); },
         "salesChannel": n => { createOrderRequest.salesChannel = n.getCollectionOfPrimitiveValues<Guid>("string"); },
@@ -630,6 +635,7 @@ export function deserializeIntoOrder(order: Partial<Order> | undefined = {}) : R
         "partnerReference": n => { order.partnerReference = n.getStringValue(); },
         "productId": n => { order.productId = n.getGuidValue(); },
         "productName": n => { order.productName = n.getStringValue(); },
+        "productValue": n => { order.productValue = n.getObjectValue<Money>(createMoneyFromDiscriminatorValue); },
         "publisherId": n => { order.publisherId = n.getGuidValue(); },
         "redemptionInstruction": n => { order.redemptionInstruction = n.getObjectValue<RedemptionInstruction>(createRedemptionInstructionFromDiscriminatorValue); },
         "regionId": n => { order.regionId = n.getGuidValue(); },
@@ -662,6 +668,7 @@ export function deserializeIntoPartner(partner: Partial<Partner> | undefined = {
     return {
         "hubSpotUrl": n => { partner.hubSpotUrl = n.getStringValue(); },
         "id": n => { partner.id = n.getGuidValue(); },
+        "imageUrl": n => { partner.imageUrl = n.getStringValue(); },
         "name": n => { partner.name = n.getStringValue(); },
     }
 }
@@ -725,6 +732,7 @@ export function deserializeIntoProblemDetails(problemDetails: Partial<ProblemDet
 // @ts-ignore
 export function deserializeIntoProduct(product: Partial<Product> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
+        "allowedCountries": n => { product.allowedCountries = n.getCollectionOfPrimitiveValues<string>("string"); },
         "allowedRegions": n => { product.allowedRegions = n.getCollectionOfPrimitiveValues<Guid>("string"); },
         "canBeReserved": n => { product.canBeReserved = n.getBooleanValue(); },
         "id": n => { product.id = n.getGuidValue(); },
@@ -736,6 +744,7 @@ export function deserializeIntoProduct(product: Partial<Product> | undefined = {
         "productTypeId": n => { product.productTypeId = n.getNumberValue(); },
         "publisherId": n => { product.publisherId = n.getGuidValue(); },
         "releaseDate": n => { product.releaseDate = n.getDateValue(); },
+        "valueType": n => { product.valueType = n.getNumberValue(); },
     }
 }
 /**
@@ -879,7 +888,7 @@ export function deserializeIntoVatDetail(vatDetail: Partial<VatDetail> | undefin
  */
 export interface HasStockRequest extends Parsable {
     /**
-     * The ISO 3166-1 alpha-2 country code representing the country in which the key will be valid. Supply one, and only one, of CountryCode or RegionId.
+     * Recommended: the consumer's ISO 3166-1 alpha-2 country code, chosen from the product's allowedCountries.Mission:Control resolves an allowed region automatically. Supply exactly one of CountryCode and RegionId.
      */
     countryCode?: string | null;
     /**
@@ -887,7 +896,7 @@ export interface HasStockRequest extends Parsable {
      */
     productId?: Guid | null;
     /**
-     * The id of the region where the key will be valid. Supply one, and only one, of RegionId or CountryCode.
+     * Alternative to CountryCode for explicit region selection. Supply exactly one of RegionId and CountryCode.
      */
     regionId?: Guid | null;
 }
@@ -901,7 +910,7 @@ export interface HasStockResponse extends Parsable {
     hasStock?: boolean | null;
 }
 /**
- * An activation key for a product.
+ * Key sold with this order.
  */
 export interface Key extends Parsable {
     /**
@@ -931,7 +940,7 @@ export interface Location extends Parsable {
     region?: string | null;
 }
 /**
- * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+ * Manufacturer's Suggested Retail Price (MSRP) for the product. This property is only populatedwhen bool GetProductsRequest.IncludeMsrp is provided and pricing information isavailable for the specified country. Returns null if no country code was provided or pricinginformation is unavailable.
  */
 export interface Money extends Parsable {
     /**
@@ -956,11 +965,11 @@ export interface Order extends Parsable {
      */
     id?: Guid | null;
     /**
-     * An activation key for a product.
+     * Key sold with this order.
      */
     key?: Key | null;
     /**
-     * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+     * The Manufacturer's Suggested Retail Price (MSRP) of the product, based on the country of the consumer at the time of the order.
      */
     msrp?: Money | null;
     /**
@@ -980,11 +989,15 @@ export interface Order extends Parsable {
      */
     productName?: string | null;
     /**
+     * The value of the product ordered if it was a variable value product. This is applicable for certain gift-cards and top-ups.
+     */
+    productValue?: Money | null;
+    /**
      * Id of the publisher where the order was placed.
      */
     publisherId?: Guid | null;
     /**
-     * Represents information about how to redeem a purchased key.
+     * Explains to the consumer how to redeem the purchased key, including any relevant URLs and instructions.
      */
     redemptionInstruction?: RedemptionInstruction | null;
     /**
@@ -1035,6 +1048,10 @@ export interface Partner extends Parsable {
      */
     id?: Guid | null;
     /**
+     * Thumbnail image of the partner
+     */
+    imageUrl?: string | null;
+    /**
      * Name of the partner
      */
     name?: string | null;
@@ -1075,7 +1092,7 @@ export interface PriceListItem extends Parsable {
      */
     countryCode?: string | null;
     /**
-     * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+     * If set, Manufacturer’s Suggested Retailer Price in this country. If null, no MSRP is available.
      */
     msrp?: Money | null;
 }
@@ -1106,7 +1123,11 @@ export interface ProblemDetails extends AdditionalDataHolder, ApiError, Parsable
  */
 export interface Product extends Parsable {
     /**
-     * Id's of the regions where this product is allowed.
+     * Distinct ISO 3166-1 alpha-2 country codes where this partner may sell the product.Resolved from the allowed regions returned for the request.
+     */
+    allowedCountries?: string[] | null;
+    /**
+     * Region IDs available for explicit region selection. For country-based ordering, use AllowedCountries instead.
      */
     allowedRegions?: Guid[] | null;
     /**
@@ -1118,7 +1139,7 @@ export interface Product extends Parsable {
      */
     id?: Guid | null;
     /**
-     * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+     * Manufacturer's Suggested Retail Price (MSRP) for the product. This property is only populatedwhen bool GetProductsRequest.IncludeMsrp is provided and pricing information isavailable for the specified country. Returns null if no country code was provided or pricinginformation is unavailable.
      */
     msrp?: Money | null;
     /**
@@ -1126,7 +1147,7 @@ export interface Product extends Parsable {
      */
     name?: string | null;
     /**
-     * Defines values for gaming platforms.
+     * Identifier of the platform for which the keys of this product are valid. Possible values:1 = Steam, 2 = Xbox, 3 = PlayStation, 4 = Nintendo, 5 = Epic Games, 6 = Electronic Arts, 99 = Other
      */
     platformId?: number | null;
     /**
@@ -1149,6 +1170,10 @@ export interface Product extends Parsable {
      * Date the product is released.
      */
     releaseDate?: Date | null;
+    /**
+     * Defines the type of value associated with the product. For example, a gift card may have a variable value, while a game key has a fixed value.
+     */
+    valueType?: number | null;
 }
 export interface ProductListResult extends Parsable {
     /**
@@ -1196,7 +1221,7 @@ export interface PublisherListResult extends Parsable {
     totalCount?: number | null;
 }
 /**
- * Represents information about how to redeem a purchased key.
+ * Explains to the consumer how to redeem the purchased key, including any relevant URLs and instructions.
  */
 export interface RedemptionInstruction extends Parsable {
     /**
@@ -1248,7 +1273,7 @@ export interface RegionListResult extends Parsable {
  */
 export interface ReportOrderRequest extends Parsable {
     /**
-     * Represents the end consumer who buys a key.
+     * The consumer who bought the key, i.e. a person.
      */
     endConsumer?: Consumer | null;
     /**
@@ -1272,11 +1297,11 @@ export interface ReportOrderRequest extends Parsable {
      */
     requestId?: Guid | null;
     /**
-     * An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.            If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.
+     * An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.
      */
     salesChannel?: Guid[] | null;
     /**
-     * Represents a sales price including VAT details. Both the price and VAT details are required. One and only one of the VAT details must be set.
+     * Pricing details of the sold key.
      */
     salesPrice?: SalesPriceRequest | null;
 }
@@ -1302,7 +1327,7 @@ export interface Reservation extends Parsable {
     statusId?: number | null;
 }
 /**
- * Represents a sales price including VAT details. Both the price and VAT details are required. One and only one of the VAT details must be set.
+ * Pricing details of the sold key.
  */
 export interface SalesPriceRequest extends Parsable {
     /**
@@ -1310,11 +1335,11 @@ export interface SalesPriceRequest extends Parsable {
      */
     deductions?: Deduction[] | null;
     /**
-     * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+     * The final price the consumer paid for the key.
      */
     priceIncludingVat?: Money | null;
     /**
-     * Represents the VAT (Value Added Tax) details associated with a sales price.The MissionControl.Application.Sales.Dto.Partner.VatDetail.Rate, MissionControl.Application.Sales.Dto.Partner.VatDetail.Amount, and MissionControl.Application.Sales.Dto.Partner.VatDetail.PriceExcludingVat properties are interdependent.When one of these properties is provided, the other two will be automatically calculated.Only one property should be set explicitly in any given request; setting more than one will result in a validation error.
+     * VAT details of the sales price.
      */
     vatDetail?: VatDetail | null;
 }
@@ -1397,6 +1422,7 @@ export function serializeCreateOrderRequest(writer: SerializationWriter, createO
     writer.writeDateValue("invoiceDate", createOrderRequest.invoiceDate);
     writer.writeStringValue("partnerReference", createOrderRequest.partnerReference);
     writer.writeGuidValue("productId", createOrderRequest.productId);
+    writer.writeObjectValue<Money>("productValue", createOrderRequest.productValue, serializeMoney);
     writer.writeGuidValue("regionId", createOrderRequest.regionId);
     writer.writeGuidValue("requestId", createOrderRequest.requestId);
     writer.writeCollectionOfPrimitiveValues<Guid>("salesChannel", createOrderRequest.salesChannel);
@@ -1506,12 +1532,14 @@ export function serializeOrder(writer: SerializationWriter, order: Partial<Order
     writer.writeStringValue("partnerReference", order.partnerReference);
     writer.writeGuidValue("productId", order.productId);
     writer.writeStringValue("productName", order.productName);
+    writer.writeObjectValue<Money>("productValue", order.productValue, serializeMoney);
     writer.writeGuidValue("publisherId", order.publisherId);
     writer.writeObjectValue<RedemptionInstruction>("redemptionInstruction", order.redemptionInstruction, serializeRedemptionInstruction);
     writer.writeGuidValue("regionId", order.regionId);
     writer.writeStringValue("regionName", order.regionName);
     writer.writeGuidValue("requestId", order.requestId);
     writer.writeNumberValue("statusId", order.statusId);
+    writer.writeStringValue("statusText", order.statusText);
 }
 /**
  * Serializes information the current object
@@ -1522,6 +1550,9 @@ export function serializeOrder(writer: SerializationWriter, order: Partial<Order
 // @ts-ignore
 export function serializeOrderListResult(writer: SerializationWriter, orderListResult: Partial<OrderListResult> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!orderListResult || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("pageCount", orderListResult.pageCount);
+    writer.writeCollectionOfObjectValues<Order>("result", orderListResult.result, serializeOrder);
+    writer.writeNumberValue("totalCount", orderListResult.totalCount);
 }
 /**
  * Serializes information the current object
@@ -1532,6 +1563,10 @@ export function serializeOrderListResult(writer: SerializationWriter, orderListR
 // @ts-ignore
 export function serializePartner(writer: SerializationWriter, partner: Partial<Partner> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!partner || isSerializingDerivedType) { return; }
+    writer.writeStringValue("hubSpotUrl", partner.hubSpotUrl);
+    writer.writeGuidValue("id", partner.id);
+    writer.writeStringValue("imageUrl", partner.imageUrl);
+    writer.writeStringValue("name", partner.name);
 }
 /**
  * Serializes information the current object
@@ -1542,6 +1577,9 @@ export function serializePartner(writer: SerializationWriter, partner: Partial<P
 // @ts-ignore
 export function serializePartnerListResult(writer: SerializationWriter, partnerListResult: Partial<PartnerListResult> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!partnerListResult || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("pageCount", partnerListResult.pageCount);
+    writer.writeCollectionOfObjectValues<Partner>("result", partnerListResult.result, serializePartner);
+    writer.writeNumberValue("totalCount", partnerListResult.totalCount);
 }
 /**
  * Serializes information the current object
@@ -1592,11 +1630,19 @@ export function serializeProblemDetails(writer: SerializationWriter, problemDeta
 // @ts-ignore
 export function serializeProduct(writer: SerializationWriter, product: Partial<Product> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!product || isSerializingDerivedType) { return; }
+    writer.writeCollectionOfPrimitiveValues<string>("allowedCountries", product.allowedCountries);
     writer.writeCollectionOfPrimitiveValues<Guid>("allowedRegions", product.allowedRegions);
     writer.writeBooleanValue("canBeReserved", product.canBeReserved);
+    writer.writeGuidValue("id", product.id);
     writer.writeObjectValue<Money>("msrp", product.msrp, serializeMoney);
+    writer.writeStringValue("name", product.name);
     writer.writeNumberValue("platformId", product.platformId);
+    writer.writeStringValue("platformName", product.platformName);
+    writer.writeStringValue("productTypeDescription", product.productTypeDescription);
+    writer.writeNumberValue("productTypeId", product.productTypeId);
     writer.writeGuidValue("publisherId", product.publisherId);
+    writer.writeDateValue("releaseDate", product.releaseDate);
+    writer.writeNumberValue("valueType", product.valueType);
 }
 /**
  * Serializes information the current object
@@ -1607,6 +1653,9 @@ export function serializeProduct(writer: SerializationWriter, product: Partial<P
 // @ts-ignore
 export function serializeProductListResult(writer: SerializationWriter, productListResult: Partial<ProductListResult> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!productListResult || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("pageCount", productListResult.pageCount);
+    writer.writeCollectionOfObjectValues<Product>("result", productListResult.result, serializeProduct);
+    writer.writeNumberValue("totalCount", productListResult.totalCount);
 }
 /**
  * Serializes information the current object
@@ -1617,6 +1666,7 @@ export function serializeProductListResult(writer: SerializationWriter, productL
 // @ts-ignore
 export function serializePublisher(writer: SerializationWriter, publisher: Partial<Publisher> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!publisher || isSerializingDerivedType) { return; }
+    writer.writeGuidValue("id", publisher.id);
     writer.writeStringValue("imageUrl", publisher.imageUrl);
     writer.writeStringValue("name", publisher.name);
 }
@@ -1629,6 +1679,9 @@ export function serializePublisher(writer: SerializationWriter, publisher: Parti
 // @ts-ignore
 export function serializePublisherListResult(writer: SerializationWriter, publisherListResult: Partial<PublisherListResult> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!publisherListResult || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("pageCount", publisherListResult.pageCount);
+    writer.writeCollectionOfObjectValues<Publisher>("result", publisherListResult.result, serializePublisher);
+    writer.writeNumberValue("totalCount", publisherListResult.totalCount);
 }
 /**
  * Serializes information the current object
@@ -1652,6 +1705,9 @@ export function serializeRedemptionInstruction(writer: SerializationWriter, rede
 export function serializeRegion(writer: SerializationWriter, region: Partial<Region> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!region || isSerializingDerivedType) { return; }
     writer.writeObjectValue<ArchivingInfo>("archiveInfo", region.archiveInfo, serializeArchivingInfo);
+    writer.writeCollectionOfPrimitiveValues<string>("countries", region.countries);
+    writer.writeGuidValue("id", region.id);
+    writer.writeStringValue("name", region.name);
 }
 /**
  * Serializes information the current object
@@ -1662,6 +1718,9 @@ export function serializeRegion(writer: SerializationWriter, region: Partial<Reg
 // @ts-ignore
 export function serializeRegionListResult(writer: SerializationWriter, regionListResult: Partial<RegionListResult> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!regionListResult || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("pageCount", regionListResult.pageCount);
+    writer.writeCollectionOfObjectValues<Region>("result", regionListResult.result, serializeRegion);
+    writer.writeNumberValue("totalCount", regionListResult.totalCount);
 }
 /**
  * Serializes information the current object
@@ -1692,6 +1751,7 @@ export function serializeReservation(writer: SerializationWriter, reservation: P
     if (!reservation || isSerializingDerivedType) { return; }
     writer.writeDateValue("expires", reservation.expires);
     writer.writeGuidValue("id", reservation.id);
+    writer.writeStringValue("statusDescription", reservation.statusDescription);
     writer.writeNumberValue("statusId", reservation.statusId);
 }
 /**
@@ -1721,15 +1781,15 @@ export function serializeVatDetail(writer: SerializationWriter, vatDetail: Parti
     writer.writeNumberValue("rate", vatDetail.rate);
 }
 /**
- * Represents the VAT (Value Added Tax) details associated with a sales price.The MissionControl.Application.Sales.Dto.Partner.VatDetail.Rate, MissionControl.Application.Sales.Dto.Partner.VatDetail.Amount, and MissionControl.Application.Sales.Dto.Partner.VatDetail.PriceExcludingVat properties are interdependent.When one of these properties is provided, the other two will be automatically calculated.Only one property should be set explicitly in any given request; setting more than one will result in a validation error.
+ * VAT details of the sales price.
  */
 export interface VatDetail extends Parsable {
     /**
-     * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+     * The VAT amount, representing the monetary value of the VAT.
      */
     amount?: Money | null;
     /**
-     * Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+     * The sales price before VAT is applied.
      */
     priceExcludingVat?: Money | null;
     /**

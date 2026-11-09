@@ -5,6 +5,7 @@ using Microsoft.Kiota.Abstractions.Serialization;
 using Microsoft.Kiota.Abstractions;
 using MissionControl.Client.Generated.Models;
 using MissionControl.Client.Generated.Product.HasStock;
+using MissionControl.Client.Generated.Product.Item;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -23,6 +24,31 @@ namespace MissionControl.Client.Generated.Product
         {
             get => new global::MissionControl.Client.Generated.Product.HasStock.HasStockRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>Gets an item from the MissionControl.Client.Generated.Product.item collection</summary>
+        /// <param name="position">The product ID returned by GET Product.</param>
+        /// <returns>A <see cref="global::MissionControl.Client.Generated.Product.Item.WithProductItemRequestBuilder"/></returns>
+        public global::MissionControl.Client.Generated.Product.Item.WithProductItemRequestBuilder this[Guid position]
+        {
+            get
+            {
+                var urlTplParams = new Dictionary<string, object>(PathParameters);
+                urlTplParams.Add("productId", position);
+                return new global::MissionControl.Client.Generated.Product.Item.WithProductItemRequestBuilder(urlTplParams, RequestAdapter);
+            }
+        }
+        /// <summary>Gets an item from the MissionControl.Client.Generated.Product.item collection</summary>
+        /// <param name="position">The product ID returned by GET Product.</param>
+        /// <returns>A <see cref="global::MissionControl.Client.Generated.Product.Item.WithProductItemRequestBuilder"/></returns>
+        [Obsolete("This indexer is deprecated and will be removed in the next major version. Use the one with the typed parameter instead.")]
+        public global::MissionControl.Client.Generated.Product.Item.WithProductItemRequestBuilder this[string position]
+        {
+            get
+            {
+                var urlTplParams = new Dictionary<string, object>(PathParameters);
+                if (!string.IsNullOrWhiteSpace(position)) urlTplParams.Add("productId", position);
+                return new global::MissionControl.Client.Generated.Product.Item.WithProductItemRequestBuilder(urlTplParams, RequestAdapter);
+            }
+        }
         /// <summary>
         /// Instantiates a new <see cref="global::MissionControl.Client.Generated.Product.ProductRequestBuilder"/> and sets the default values.
         /// </summary>
@@ -40,7 +66,7 @@ namespace MissionControl.Client.Generated.Product
         {
         }
         /// <summary>
-        /// Retrieves all products available.
+        /// Each product includes allowedCountries: the ISO 3166-1 alpha-2 country codes where your partner account may sell it.Use the product&apos;s id as productId and the consumer&apos;s country as countryCode when ordering, checking stock, or reserving a key.allowedRegions remains available for explicit region selection.
         /// </summary>
         /// <returns>A <see cref="global::MissionControl.Client.Generated.Models.ProductListResult"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -65,7 +91,7 @@ namespace MissionControl.Client.Generated.Product
             return await RequestAdapter.SendAsync<global::MissionControl.Client.Generated.Models.ProductListResult>(requestInfo, global::MissionControl.Client.Generated.Models.ProductListResult.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Retrieves all products available.
+        /// Each product includes allowedCountries: the ISO 3166-1 alpha-2 country codes where your partner account may sell it.Use the product&apos;s id as productId and the consumer&apos;s country as countryCode when ordering, checking stock, or reserving a key.allowedRegions remains available for explicit region selection.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -93,7 +119,7 @@ namespace MissionControl.Client.Generated.Product
             return new global::MissionControl.Client.Generated.Product.ProductRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Retrieves all products available.
+        /// Each product includes allowedCountries: the ISO 3166-1 alpha-2 country codes where your partner account may sell it.Use the product&apos;s id as productId and the consumer&apos;s country as countryCode when ordering, checking stock, or reserving a key.allowedRegions remains available for explicit region selection.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ProductRequestBuilderGetQueryParameters 
@@ -106,7 +132,7 @@ namespace MissionControl.Client.Generated.Product
 #else
             public string CountryCode { get; set; }
 #endif
-            /// <summary>Optional flag to include MSRP information in the response.When true and MissionControl.Application.Products.Dto.Partner.GetProductsRequest.CountryCode is provided, MSRP for the specified country will be included for each product if configured.This property is only effective when MissionControl.Application.Products.Dto.Partner.GetProductsRequest.CountryCode is also specified.Default is false.</summary>
+            /// <summary>Optional flag to include MSRP information in the response.When true and string? GetProductsRequest.CountryCode is provided, MSRP for the specified country will be included for each product if configured.This property is only effective when string? GetProductsRequest.CountryCode is also specified.Default is false.</summary>
             public bool? IncludeMsrp { get; set; }
             /// <summary>Optional search term to find products by name.Performs a partial, case-insensitive match against product names.If null or empty, no name filtering is applied.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER

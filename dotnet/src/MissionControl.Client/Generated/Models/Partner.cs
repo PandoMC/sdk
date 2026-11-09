@@ -16,20 +16,28 @@ namespace MissionControl.Client.Generated.Models
         /// <summary>Optional HubSpot url</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? HubSpotUrl { get; private set; }
+        public string? HubSpotUrl { get; set; }
 #nullable restore
 #else
-        public string HubSpotUrl { get; private set; }
+        public string HubSpotUrl { get; set; }
 #endif
         /// <summary>Unique identifier for the partner</summary>
-        public Guid? Id { get; private set; }
+        public Guid? Id { get; set; }
+        /// <summary>Thumbnail image of the partner</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ImageUrl { get; set; }
+#nullable restore
+#else
+        public string ImageUrl { get; set; }
+#endif
         /// <summary>Name of the partner</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? Name { get; private set; }
+        public string? Name { get; set; }
 #nullable restore
 #else
-        public string Name { get; private set; }
+        public string Name { get; set; }
 #endif
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -51,6 +59,7 @@ namespace MissionControl.Client.Generated.Models
             {
                 { "hubSpotUrl", n => { HubSpotUrl = n.GetStringValue(); } },
                 { "id", n => { Id = n.GetGuidValue(); } },
+                { "imageUrl", n => { ImageUrl = n.GetStringValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
             };
         }
@@ -61,6 +70,10 @@ namespace MissionControl.Client.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteStringValue("hubSpotUrl", HubSpotUrl);
+            writer.WriteGuidValue("id", Id);
+            writer.WriteStringValue("imageUrl", ImageUrl);
+            writer.WriteStringValue("name", Name);
         }
     }
 }

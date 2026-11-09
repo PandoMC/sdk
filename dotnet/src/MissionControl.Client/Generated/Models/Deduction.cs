@@ -13,7 +13,7 @@ namespace MissionControl.Client.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Deduction : IParsable
     {
-        /// <summary>Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.</summary>
+        /// <summary>The monetary value of the deduction.This represents the actual amount deducted from or added to the sale.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Money? Amount { get; set; }
@@ -21,7 +21,7 @@ namespace MissionControl.Client.Generated.Models
 #else
         public global::MissionControl.Client.Generated.Models.Money Amount { get; set; }
 #endif
-        /// <summary>The name or description of the deduction.This is only required when the deduction type is MissionControl.Domain.Sales.Values.DeductionType.Other.It allows you to specify a custom deduction that does not fit into predefined categories.</summary>
+        /// <summary>The name or description of the deduction.This is only required when the deduction type is DeductionType.Other.It allows you to specify a custom deduction that does not fit into predefined categories.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public string? Name { get; set; }

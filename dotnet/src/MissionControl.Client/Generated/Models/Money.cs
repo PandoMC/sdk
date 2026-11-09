@@ -8,7 +8,7 @@ using System;
 namespace MissionControl.Client.Generated.Models
 {
     /// <summary>
-    /// Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.
+    /// Manufacturer&apos;s Suggested Retail Price (MSRP) for the product. This property is only populatedwhen bool GetProductsRequest.IncludeMsrp is provided and pricing information isavailable for the specified country. Returns null if no country code was provided or pricinginformation is unavailable.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Money : IParsable

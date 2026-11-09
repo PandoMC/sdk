@@ -93,6 +93,17 @@ var response = await client.Product.HasStock.PostAsync(new HasStockRequest
 Console.WriteLine(response!.HasStock == true ? "In stock" : "Out of stock");
 ```
 
+### Get redemption instructions
+
+Retrieve a product's redemption instructions (one entry per language) before placing an order.
+
+```csharp
+var instructions = await client.Product[productId].RedemptionInstructions.GetAsync();
+
+foreach (var instruction in instructions!)
+    Console.WriteLine($"{instruction.LanguageCode}: {instruction.Text}");
+```
+
 ### Reserve → claim (place an order)
 
 ```csharp

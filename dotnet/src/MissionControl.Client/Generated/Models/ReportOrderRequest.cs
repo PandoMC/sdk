@@ -13,7 +13,7 @@ namespace MissionControl.Client.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class ReportOrderRequest : IParsable
     {
-        /// <summary>Represents the end consumer who buys a key.</summary>
+        /// <summary>The consumer who bought the key, i.e. a person.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Consumer? EndConsumer { get; set; }
@@ -37,7 +37,7 @@ namespace MissionControl.Client.Generated.Models
         public Guid? RegionId { get; set; }
         /// <summary>Uniquely identifies this request. Must be unique for each request you make. In case of errors, can be used for resolving.</summary>
         public Guid? RequestId { get; set; }
-        /// <summary>An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.            If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.</summary>
+        /// <summary>An ordered list of partner IDs representing the sales channel through which the key is transferredon its way to the end consumer. Each ID in the list corresponds to a partner involvedin the distribution process, and the order of the list reflects the sequence in which the key passesthrough the partners.If the actor sells the key directly to the end consumer, this list can be empty. However, if the actoris a distributor, the partner IDs of the e-tailer(s) or other intermediaries must be provided in the exactorder that the key moves through them before reaching the consumer.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public List<Guid?>? SalesChannel { get; set; }
@@ -45,7 +45,7 @@ namespace MissionControl.Client.Generated.Models
 #else
         public List<Guid?> SalesChannel { get; set; }
 #endif
-        /// <summary>Represents a sales price including VAT details. Both the price and VAT details are required. One and only one of the VAT details must be set.</summary>
+        /// <summary>Pricing details of the sold key.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.SalesPriceRequest? SalesPrice { get; set; }

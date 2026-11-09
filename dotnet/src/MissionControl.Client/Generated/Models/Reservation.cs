@@ -20,10 +20,10 @@ namespace MissionControl.Client.Generated.Models
         /// <summary>Human readable description of the status. Do not use this for programmatic purposes.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? StatusDescription { get; private set; }
+        public string? StatusDescription { get; set; }
 #nullable restore
 #else
-        public string StatusDescription { get; private set; }
+        public string StatusDescription { get; set; }
 #endif
         /// <summary>Id of the status of the reservation. Possible values:1 = AwaitingClaim2 = Claimed3 = Cancelled4 = Expired</summary>
         public int? StatusId { get; set; }
@@ -60,6 +60,7 @@ namespace MissionControl.Client.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteDateTimeOffsetValue("expires", Expires);
             writer.WriteGuidValue("id", Id);
+            writer.WriteStringValue("statusDescription", StatusDescription);
             writer.WriteIntValue("statusId", StatusId);
         }
     }

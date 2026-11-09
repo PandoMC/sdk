@@ -34,7 +34,7 @@ namespace MissionControl.Client.Generated.Product.HasStock
         {
         }
         /// <summary>
-        /// Checks if a product has stock.
+        /// Supply productId and countryCode (ISO 3166-1 alpha-2). Mission:Control resolves an allowed region automatically.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.
         /// </summary>
         /// <returns>A <see cref="global::MissionControl.Client.Generated.Models.HasStockResponse"/></returns>
         /// <param name="body">Request to send to check if a product has stock.</param>
@@ -61,7 +61,7 @@ namespace MissionControl.Client.Generated.Product.HasStock
             return await RequestAdapter.SendAsync<global::MissionControl.Client.Generated.Models.HasStockResponse>(requestInfo, global::MissionControl.Client.Generated.Models.HasStockResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Checks if a product has stock.
+        /// Supply productId and countryCode (ISO 3166-1 alpha-2). Mission:Control resolves an allowed region automatically.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">Request to send to check if a product has stock.</param>

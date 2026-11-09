@@ -17,7 +17,7 @@ namespace MissionControl.Client.Generated.Models
         public DateTimeOffset? Created { get; set; }
         /// <summary>Unique identifier of the order.</summary>
         public Guid? Id { get; set; }
-        /// <summary>An activation key for a product.</summary>
+        /// <summary>Key sold with this order.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Key? Key { get; set; }
@@ -25,7 +25,7 @@ namespace MissionControl.Client.Generated.Models
 #else
         public global::MissionControl.Client.Generated.Models.Key Key { get; set; }
 #endif
-        /// <summary>Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.</summary>
+        /// <summary>The Manufacturer&apos;s Suggested Retail Price (MSRP) of the product, based on the country of the consumer at the time of the order.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Money? Msrp { get; set; }
@@ -53,9 +53,17 @@ namespace MissionControl.Client.Generated.Models
 #else
         public string ProductName { get; set; }
 #endif
+        /// <summary>The value of the product ordered if it was a variable value product. This is applicable for certain gift-cards and top-ups.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::MissionControl.Client.Generated.Models.Money? ProductValue { get; set; }
+#nullable restore
+#else
+        public global::MissionControl.Client.Generated.Models.Money ProductValue { get; set; }
+#endif
         /// <summary>Id of the publisher where the order was placed.</summary>
         public Guid? PublisherId { get; set; }
-        /// <summary>Represents information about how to redeem a purchased key.</summary>
+        /// <summary>Explains to the consumer how to redeem the purchased key, including any relevant URLs and instructions.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.RedemptionInstruction? RedemptionInstruction { get; set; }
@@ -80,10 +88,10 @@ namespace MissionControl.Client.Generated.Models
         /// <summary>Text representation of the current status of the order, for human readability only.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? StatusText { get; private set; }
+        public string? StatusText { get; set; }
 #nullable restore
 #else
-        public string StatusText { get; private set; }
+        public string StatusText { get; set; }
 #endif
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -111,6 +119,7 @@ namespace MissionControl.Client.Generated.Models
                 { "partnerReference", n => { PartnerReference = n.GetStringValue(); } },
                 { "productId", n => { ProductId = n.GetGuidValue(); } },
                 { "productName", n => { ProductName = n.GetStringValue(); } },
+                { "productValue", n => { ProductValue = n.GetObjectValue<global::MissionControl.Client.Generated.Models.Money>(global::MissionControl.Client.Generated.Models.Money.CreateFromDiscriminatorValue); } },
                 { "publisherId", n => { PublisherId = n.GetGuidValue(); } },
                 { "redemptionInstruction", n => { RedemptionInstruction = n.GetObjectValue<global::MissionControl.Client.Generated.Models.RedemptionInstruction>(global::MissionControl.Client.Generated.Models.RedemptionInstruction.CreateFromDiscriminatorValue); } },
                 { "regionId", n => { RegionId = n.GetGuidValue(); } },
@@ -135,12 +144,14 @@ namespace MissionControl.Client.Generated.Models
             writer.WriteStringValue("partnerReference", PartnerReference);
             writer.WriteGuidValue("productId", ProductId);
             writer.WriteStringValue("productName", ProductName);
+            writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.Money>("productValue", ProductValue);
             writer.WriteGuidValue("publisherId", PublisherId);
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.RedemptionInstruction>("redemptionInstruction", RedemptionInstruction);
             writer.WriteGuidValue("regionId", RegionId);
             writer.WriteStringValue("regionName", RegionName);
             writer.WriteGuidValue("requestId", RequestId);
             writer.WriteIntValue("statusId", StatusId);
+            writer.WriteStringValue("statusText", StatusText);
         }
     }
 }

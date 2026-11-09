@@ -11,7 +11,7 @@ import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type Requ
  */
 export interface CancelOrderRequestBuilder extends BaseRequestBuilder<CancelOrderRequestBuilder> {
     /**
-     * Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.            Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
+     * Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
      * @param body Request to cancel an order.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<Order>}
@@ -20,7 +20,7 @@ export interface CancelOrderRequestBuilder extends BaseRequestBuilder<CancelOrde
      */
      post(body: CancelOrderRequest, requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<Order | undefined>;
     /**
-     * Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.            Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
+     * Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
      * @param body Request to cancel an order.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}

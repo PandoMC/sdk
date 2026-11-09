@@ -8,7 +8,7 @@ using System;
 namespace MissionControl.Client.Generated.Models
 {
     /// <summary>
-    /// Represents information about how to redeem a purchased key.
+    /// Explains to the consumer how to redeem the purchased key, including any relevant URLs and instructions.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class RedemptionInstruction : IParsable

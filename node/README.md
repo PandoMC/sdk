@@ -65,6 +65,18 @@ const response = await client.product.hasStock.post({
 console.log(response?.hasStock ? "In stock" : "Out of stock");
 ```
 
+### Get redemption instructions
+
+Retrieve a product's redemption instructions (one entry per language) before placing an order.
+
+```ts
+const instructions = await client.product.byProductId(productId).redemptionInstructions.get();
+
+for (const instruction of instructions ?? []) {
+  console.log(`${instruction.languageCode}: ${instruction.text}`);
+}
+```
+
 ### Reserve → claim (place an order)
 
 ```ts
