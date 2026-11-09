@@ -10,6 +10,7 @@ namespace MissionControl.Client;
 public sealed class ClientBuilder
 {
     private string _baseUrl = MissionControlEnvironment.Production.BaseUrl();
+    private string _assetsBaseUrl = MissionControlEnvironment.Production.AssetsBaseUrl();
     private string _scope = MissionControlEnvironment.Production.Scope();
     private string _tenantId = "13d084c1-d072-41f2-878b-c45ca721c9f6";
     private string? _defaultPartnerId;
@@ -49,6 +50,20 @@ public sealed class ClientBuilder
     }
 
     /// <summary>
+    /// Overrides the base URL used for Assets API requests (<see cref="Generated.Client.Assets"/>).
+    /// The Assets API is a separate service, so it is not affected by <see cref="WithBaseUrl"/>.
+    /// When combined with <see cref="ForEnvironment"/>, the last call wins.
+    /// </summary>
+    /// <param name="assetsBaseUrl">The base URL, e.g. <c>http://localhost:5001/partnerApi/v1</c>.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public ClientBuilder WithAssetsBaseUrl(string assetsBaseUrl)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(assetsBaseUrl);
+        _assetsBaseUrl = assetsBaseUrl;
+        return this;
+    }
+
+    /// <summary>
     /// Overrides the OAuth scope used when acquiring tokens.
     /// Useful when running against a local or custom environment whose app registration
     /// differs from the well-known environments.
@@ -72,6 +87,7 @@ public sealed class ClientBuilder
     public ClientBuilder ForEnvironment(MissionControlEnvironment environment)
     {
         _baseUrl = environment.BaseUrl();
+        _assetsBaseUrl = environment.AssetsBaseUrl();
         _scope = environment.Scope();
         return this;
     }
@@ -123,7 +139,16 @@ public sealed class ClientBuilder
             BaseUrl = _baseUrl
         };
 
-        return new Generated.Client(adapter);
+        // The Assets API is a separate service: same HTTP pipeline and credentials, different base URL.
+        var assetsAdapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient)
+        {
+            BaseUrl = _assetsBaseUrl
+        };
+
+        return new Generated.Client(adapter)
+        {
+            Assets = new Generated.Assets.AssetsClient(assetsAdapter)
+        };
     }
 
     // Stored until Build() so ForEnvironment() called after WithAzureAdClientCredentials()

@@ -22,6 +22,10 @@ namespace MissionControl.Client.IntegrationTests;
 ///   MC_PRODUCT_ID     – Product GUID used in reservation write tests
 ///   MC_REGION_ID      – Region GUID used in reservation write tests
 ///   MC_PUBLISHER_ID   – Publisher GUID used in publisher-scoped tests
+///
+/// Optional keys:
+///   MC_ASSETS_BASE_URL – Assets API base URL, e.g. https://api.sandbox.missioncontrol.io/assets/partnerApi/v1.
+///                        Asset tests are skipped when not set.
 /// </remarks>
 public sealed class IntegrationTestFixture
 {
@@ -36,6 +40,7 @@ public sealed class IntegrationTestFixture
     public Guid ProductId { get; }
     public Guid RegionId { get; }
     public Guid PublisherId { get; }
+    public bool HasAssetsBaseUrl { get; }
 
     public IntegrationTestFixture()
     {
@@ -48,6 +53,7 @@ public sealed class IntegrationTestFixture
         var productId = Config["MC_PRODUCT_ID"];
         var regionId = Config["MC_REGION_ID"];
         var publisherId = Config["MC_PUBLISHER_ID"];
+        var assetsBaseUrl = Config["MC_ASSETS_BASE_URL"];
 
         if (string.IsNullOrWhiteSpace(tenantId) ||
             string.IsNullOrWhiteSpace(clientId) ||
@@ -69,12 +75,17 @@ public sealed class IntegrationTestFixture
         RegionId = Guid.Parse(regionId);
         PublisherId = Guid.Parse(publisherId);
 
-        _client = new ClientBuilder()
+        var builder = new ClientBuilder()
             .WithAzureAdClientCredentials(clientId, clientSecret, tenantId)
             .WithDefaultPartnerId(partnerId)
             .WithBaseUrl(baseUrl)
-            .WithScope(scope)
-            .Build();
+            .WithScope(scope);
+
+        HasAssetsBaseUrl = !string.IsNullOrWhiteSpace(assetsBaseUrl);
+        if (HasAssetsBaseUrl)
+            builder.WithAssetsBaseUrl(assetsBaseUrl!);
+
+        _client = builder.Build();
     }
 
     /// <summary>

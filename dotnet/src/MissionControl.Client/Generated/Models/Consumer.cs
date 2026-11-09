@@ -8,7 +8,7 @@ using System;
 namespace MissionControl.Client.Generated.Models
 {
     /// <summary>
-    /// The consumer who bought the key, i.e. a person.
+    /// The consumer who buys the key.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Consumer : IParsable

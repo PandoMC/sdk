@@ -87,7 +87,18 @@ for (const [name, schema] of Object.entries(schemas)) {
     schema.additionalProperties = name === "ProblemDetails" ? {} : false;
 }
 
-// 6. Error responses are no longer described; the API still returns ProblemDetails for these.
+// 6. Error responses are no longer described; the API still returns ProblemDetails (RFC 7807) for these.
+schemas.ProblemDetails ??= {
+  type: "object",
+  properties: {
+    type: { type: "string" },
+    title: { type: "string" },
+    status: { type: "integer", format: "int32" },
+    detail: { type: "string" },
+    instance: { type: "string" },
+  },
+  additionalProperties: {},
+};
 const problem = (description) => ({
   description,
   content: { "application/json": { schema: { $ref: schemaRef("ProblemDetails") } } },

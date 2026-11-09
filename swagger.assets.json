@@ -1,0 +1,406 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Partner API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://api.missioncontrol.io/assets/partnerApi/v1"
+    }
+  ],
+  "paths": {
+    "/AssetPack/{publisherId}/{productId}": {
+      "get": {
+        "tags": [
+          "AssetPack"
+        ],
+        "summary": "Gets all assetpacks for a product.",
+        "parameters": [
+          {
+            "name": "publisherId",
+            "in": "path",
+            "description": "Id of the publisher of the product.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "3c9e8b7a-1d2f-4e5a-9b8c-7d6e5f4a3b21"
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Id of the product.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPackListResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPackListResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPackListResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/AssetPack/{publisherId}/{productId}/{assetPackId}": {
+      "get": {
+        "tags": [
+          "AssetPack"
+        ],
+        "summary": "Gets an asset pack",
+        "parameters": [
+          {
+            "name": "publisherId",
+            "in": "path",
+            "description": "Id of the publisher of the product.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "3c9e8b7a-1d2f-4e5a-9b8c-7d6e5f4a3b21"
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Id of the product.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
+          },
+          {
+            "name": "assetPackId",
+            "in": "path",
+            "description": "Id of the asset pack.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "x7Kp2QaZ"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPackDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPackDetail"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPackDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Asset": {
+        "required": [
+          "url",
+          "fileName",
+          "folder",
+          "width",
+          "height",
+          "embargo",
+          "lastModified"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Url to the asset which can be used directly in your website. Use our image optimization service to scale the image to your needs.",
+            "example": "https://example.com/assets/cover.jpg"
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Name of the file, e.g. \"image.jpg\"",
+            "example": "cover.jpg"
+          },
+          "folder": {
+            "type": "string",
+            "description": "Categorizes assets by folders.",
+            "example": "Covers"
+          },
+          "width": {
+            "type": "integer",
+            "description": "Original width of the image.",
+            "format": "int32",
+            "example": 1920
+          },
+          "height": {
+            "type": "integer",
+            "description": "Original height of the image.",
+            "format": "int32",
+            "example": 1080
+          },
+          "embargo": {
+            "type": "string",
+            "description": "If set, a placeholder image will be shown until this date and time. The value is in UTC.",
+            "format": "date-time"
+          },
+          "lastModified": {
+            "type": "string",
+            "description": "Date/time the asset was last modified.",
+            "format": "date-time",
+            "example": "2024-02-15T10:30:00"
+          }
+        },
+        "description": "Contains details about an asset in an assetpack",
+        "additionalProperties": false
+      },
+      "AssetPack": {
+        "required": [
+          "id",
+          "name",
+          "productId",
+          "productName",
+          "lastModified"
+        ],
+        "type": "object",
+        "properties": {
+          "countryCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "ISO 3166-1 alpha-2 country codes associated with this pack."
+          },
+          "id": {
+            "type": "string",
+            "description": "Id of the asset pack",
+            "example": "x7Kp2QaZ"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human readable name for the asset pack.",
+            "example": "Key art"
+          },
+          "productId": {
+            "type": "string",
+            "description": "Unique identifier of the asset pack's product.",
+            "format": "uuid",
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
+          },
+          "productName": {
+            "type": "string",
+            "description": "Product the assets are associated with.",
+            "example": "Example Game - Standard Edition"
+          },
+          "lastModified": {
+            "type": "string",
+            "description": "Date/time the asset pack was last modified.",
+            "format": "date-time",
+            "example": "2024-02-15T10:30:00"
+          }
+        },
+        "description": "Collection of assets for a product.",
+        "additionalProperties": false
+      },
+      "AssetPackDetail": {
+        "required": [
+          "id",
+          "name",
+          "productId",
+          "productName",
+          "lastModified"
+        ],
+        "type": "object",
+        "properties": {
+          "assets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Asset"
+            },
+            "description": "Collection of assets in this pack."
+          },
+          "countryCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "ISO 3166-1 alpha-2 country codes associated with this pack."
+          },
+          "id": {
+            "type": "string",
+            "description": "Id of the asset pack",
+            "example": "x7Kp2QaZ"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human readable name for the asset pack.",
+            "example": "Key art"
+          },
+          "productId": {
+            "type": "string",
+            "description": "Unique identifier of the asset pack's product.",
+            "format": "uuid",
+            "example": "80bd6d7b-cbe4-4279-af5f-fdaa16998e50"
+          },
+          "productName": {
+            "type": "string",
+            "description": "Product the assets are associated with.",
+            "example": "Example Game - Standard Edition"
+          },
+          "lastModified": {
+            "type": "string",
+            "description": "Date/time the asset pack was last modified.",
+            "format": "date-time",
+            "example": "2024-02-15T10:30:00"
+          }
+        },
+        "description": "Collection of assets for a product, including the assets in the pack.",
+        "additionalProperties": false
+      },
+      "AssetPackListResult": {
+        "required": [
+          "result",
+          "totalCount",
+          "pageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetPack"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {}
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Json Web Token"
+      },
+      "XPartnerId": {
+        "type": "apiKey",
+        "description": "Partner identifier",
+        "name": "X-Partner-Id",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    },
+    {
+      "XPartnerId": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "AssetPack"
+    }
+  ]
+}

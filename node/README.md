@@ -114,6 +114,24 @@ console.log(`Order ${order!.id} placed.`);
 await client.reservation.byReservationId(reservation!.id!).cancel.post();
 ```
 
+### Get asset packs
+
+Asset packs hold the images, logos and other marketing assets publishers provide for a product. They are served by the Assets API, available on `client.assets`.
+
+```ts
+const product = client.assets.assetPack.byPublisherId(publisherId).byProductId(productId);
+const packs = await product.get();
+
+for (const pack of packs?.result ?? []) {
+  // Fetch a pack to get its assets.
+  const detail = await product.byAssetPackId(pack.id!).get();
+
+  for (const asset of detail?.assets ?? []) {
+    console.log(`${asset.fileName}  ${asset.url}`);
+  }
+}
+```
+
 ### Filtering and pagination
 
 All list endpoints accept an optional `queryParameters` object for filtering and pagination. Every parameter is optional — only set what you need.
@@ -149,6 +167,7 @@ const result = await client.product.get({
 | `withDefaultPartnerId(partnerId)`                                 | Set the `X-Partner-Id` header for every request    |
 | `forEnvironment(env)`                                             | Target `Sandbox` or `Production`                   |
 | `withBaseUrl(url)`                                                | Override the base URL (e.g. for local development) |
+| `withAssetsBaseUrl(url)`                                          | Override the base URL of the Assets API            |
 | `withScope(scope)`                                                | Override the OAuth scope                           |
 | `build()`                                                         | Return the configured `Client` instance            |
 

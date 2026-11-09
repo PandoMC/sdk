@@ -1,0 +1,35 @@
+{
+  "descriptionHash": "BBAB30C3C66DDE5AD06A2B7B4653CFC2983706611C6A4FEC786F5EEE80B31C205665F82D88C95D71D61A45963D4B7D8400E2D743ECA5C3E000D29C4402DD95CD",
+  "descriptionLocation": "../../../../swagger.assets.json",
+  "lockFileVersion": "1.0.0",
+  "kiotaVersion": "1.32.5",
+  "clientClassName": "assetsClient",
+  "typeAccessModifier": "Public",
+  "clientNamespaceName": "missioncontrol.client.assets",
+  "language": "TypeScript",
+  "usesBackingStore": false,
+  "excludeBackwardCompatible": false,
+  "includeAdditionalData": true,
+  "disableSSLValidation": false,
+  "serializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Form.FormSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Multipart.MultipartSerializationWriterFactory"
+  ],
+  "deserializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Text.TextParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Form.FormParseNodeFactory"
+  ],
+  "structuredMimeTypes": [
+    "application/json",
+    "text/plain;q=0.9",
+    "application/x-www-form-urlencoded;q=0.2",
+    "multipart/form-data;q=0.1"
+  ],
+  "includePatterns": [],
+  "excludePatterns": [],
+  "disabledValidationRules": [],
+  "allowedExternalOrigins": []
+}
