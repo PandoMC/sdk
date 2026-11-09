@@ -68,11 +68,11 @@ export interface ProductRequestBuilderGetQueryParameters {
      */
     publisherId?: Guid[];
     /**
-     * Field to sort by
+     * The field to sort the results on. Defaults to `name`.
      */
     sortBy?: GetSortByQueryParameterType;
     /**
-     * Direction to sort on
+     * The direction to sort the results in. Defaults to `asc`.
      */
     sortDirection?: GetSortDirectionQueryParameterType;
 }

@@ -60,9 +60,9 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "The follow error codes may be returned:\n| Type | Details  | Notes/Possible Solutions |\n| --------| ------- |------- |\n| OutOfStockError | The requested SKU is out of stock. | Request the publisher to add stock and try again later. |\n| ValidationError | Unknown product | A product for the requested productId does not exist. |\n| ValidationError | Unknown region | A region for the requested regionId does not exist. |\n| ValidationError | Ordering of product not allowed | The partner is not allowed to purchase the product in the requested country or explicitly selected region. Check allowedCountries or allowedRegions and request access from the publisher. |\n| ValidationError | Name must be provided for Other deductions. | Name is required for deductions which have the type Other. |\n| ValidationError | Name must not be provided for non-Other type deductions. | A name was provided for a deduction which does not have the type Other. Remove the name for this deduction and try again. |\n| ValidationError | Only one of the VAT details can be provided. | More than one of the VAT details was provided. |\n| https://tools.ietf.org/html/rfc9110#section-15.5.1 | One or more validation errors occurred | The request was invalid, and no further processing occurred. A list of errors will be provided, detailing the issues with the request. Common causes include missing required fields, incorrect data types, or failed additional validations. |",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -72,7 +72,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -131,9 +131,9 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "The follow error codes may be returned:\n| Type | Details  | Notes/Possible Solutions |\n| --------| ------- |------- |        \n| ValidationError | Unknown product | A product for the requested productId does not exist. |        \n| ValidationError | Ordering of product not allowed | The publisher has either not provided access to the product or the region of the product. Request the publisher to provide access. |\n| ValidationError | Name must be provided for Other deductions. | Name is required for deductions which have the type Other. |\n| ValidationError | Name must not be provided for non-Other type deductions. | A name was provided for a deduction which does not have the type Other. Remove the name for this deduction and try again. |\n| ValidationError | Only one of the VAT details can be provided. | More than one of the VAT details was provided.  |\n| https://tools.ietf.org/html/rfc9110#section-15.5.1 | One or more validation errors occurred | The request was invalid, and no further processing occurred. A list of errors will be provided, detailing the issues with the request. Common causes include missing required fields, incorrect data types, or failed additional validations. |",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -143,7 +143,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -215,7 +215,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -225,7 +225,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -320,7 +320,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -330,7 +330,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -389,9 +389,9 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "The follow error codes may be returned:\n| Type | Details  | Notes/Possible Solutions |\n| --------| ------- |------- |\n| NotFoundError | Order not found | An order with the specified request ID does not exist. |\n| ValidationError | Order cannot be cancelled | The order is not eligible for cancellation (e.g., too much time has passed since creation, or the order has already been fulfilled/cancelled). |\n| https://tools.ietf.org/html/rfc9110#section-15.5.1 | One or more validation errors occurred | The request was invalid, and no further processing occurred. A list of errors will be provided, detailing the issues with the request. Common causes include missing required fields or incorrect data types. |",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -401,7 +401,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -437,7 +437,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -459,7 +459,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -469,7 +469,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -509,7 +509,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -531,7 +531,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -541,7 +541,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -628,32 +628,34 @@
           {
             "name": "sortBy",
             "in": "query",
-            "description": "Field to sort by",
+            "description": "The field to sort the results on. Defaults to `name`.",
             "schema": {
               "enum": [
                 "name",
                 "productTypeId",
                 "releaseDate"
               ],
-              "type": "string"
+              "type": "string",
+              "default": "name"
             }
           },
           {
             "name": "sortDirection",
             "in": "query",
-            "description": "Direction to sort on",
+            "description": "The direction to sort the results in. Defaults to `asc`.",
             "schema": {
               "enum": [
                 "ASC",
                 "DESC"
               ],
-              "type": "string"
+              "type": "string",
+              "default": "ASC"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "A filtered list of products available.",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -675,7 +677,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -685,7 +687,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -747,7 +749,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -777,7 +779,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -838,7 +840,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -848,7 +850,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -885,7 +887,7 @@
         ],
         "responses": {
           "200": {
-            "description": "A paginated list of publisher entities.",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -907,7 +909,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -917,7 +919,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -973,7 +975,7 @@
         ],
         "responses": {
           "200": {
-            "description": "A paginated list of region entities.",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -995,7 +997,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1005,7 +1007,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1066,7 +1068,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1076,7 +1078,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1129,7 +1131,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1139,7 +1141,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1190,7 +1192,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1200,7 +1202,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -1453,9 +1455,24 @@
         "type": "object",
         "properties": {
           "type": {
+            "enum": [
+              1,
+              2,
+              3
+            ],
             "type": "integer",
-            "format": "int32",
             "description": "The type of the deduction. Possible values are:\n1 = \"Other\", 2 = \"PaymentFee\", and 3 = \"AffiliateFee\".\nThe deduction type defines the nature of the fee or discount.\nIf the type is set to Other, a custom Name must be provided.",
+            "x-enum-varnames": [
+              "Other",
+              "PaymentFee",
+              "AffiliateFee"
+            ],
+            "x-enum-descriptions": [
+              "Any other type of deduction that is not covered by the other types.",
+              "The cost of the payment method used to pay for the order.",
+              "The cut of the sale taken by an affiliate that brought the customer to the partner."
+            ],
+            "format": "int32",
             "examples": [
               1
             ]
@@ -1654,8 +1671,23 @@
             "$ref": "#/components/schemas/RedemptionInstruction"
           },
           "statusId": {
+            "enum": [
+              1,
+              2,
+              3
+            ],
             "type": "integer",
             "description": "Status of the order. Possible values:\n1 - Open, 2 - Fulfilled, 3 - Cancelled",
+            "x-enum-varnames": [
+              "Open",
+              "Fulfilled",
+              "Cancelled"
+            ],
+            "x-enum-descriptions": [
+              "The order is created, no key has been assigned yet.",
+              "The order is fulfilled.",
+              "The order was cancelled because of a failure during the key retrieval or fulfillment process."
+            ],
             "format": "int32"
           },
           "statusText": {
@@ -1786,8 +1818,38 @@
             "example": "3c9e8b7a-1d2f-4e5a-9b8c-7d6e5f4a3b21"
           },
           "platformId": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              99
+            ],
             "type": "integer",
             "description": "Identifier of the platform for which the keys of this product are valid. Possible values:\n1 = Steam, 2 = Xbox, 3 = PlayStation, 4 = Nintendo, 5 = Epic Games, 6 = Electronic Arts, 99 = Other",
+            "x-enum-varnames": [
+              "Steam",
+              "Xbox",
+              "PlayStation",
+              "Nintendo",
+              "Epic",
+              "EA",
+              "CrossPlatform",
+              "Other"
+            ],
+            "x-enum-descriptions": [
+              "Steam",
+              "Microsoft Xbox",
+              "Sony PlayStation",
+              "Nintendo",
+              "Epic Games",
+              "Electronic Arts",
+              "Cross-platform",
+              "Any other platform not listed"
+            ],
             "format": "int32"
           },
           "platformName": {
@@ -1796,8 +1858,35 @@
             "example": "Steam"
           },
           "productTypeId": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              99
+            ],
             "type": "integer",
             "description": "Type of the product.",
+            "x-enum-varnames": [
+              "Game",
+              "DLC",
+              "GiftCard",
+              "Software",
+              "InGameContent",
+              "Subscription",
+              "Other"
+            ],
+            "x-enum-descriptions": [
+              "A stand-alone game",
+              "Downloadable content for a game, e.g. a skin, characters, maps, etc.",
+              "Card holding a value, e.g. in-game currency, money, etc.",
+              "Any product which is not game related, e.g. operating system, virusscanner, etc.",
+              "Content puch",
+              "Subscription service",
+              "Any product which does not fit a specific type"
+            ],
             "format": "int32"
           },
           "productTypeDescription": {
@@ -1843,8 +1932,20 @@
             "$ref": "#/components/schemas/Money"
           },
           "valueType": {
+            "enum": [
+              1,
+              2
+            ],
             "type": "integer",
             "description": "Defines the type of value associated with the product. For example, a gift card may have a variable value, while a game key has a fixed value.",
+            "x-enum-varnames": [
+              "Fixed",
+              "Variable"
+            ],
+            "x-enum-descriptions": [
+              "The product has a fixed price.",
+              "The value of the product is variable, e.g. a gift card where the caller can request a specific value to be assigned to the product."
+            ],
             "format": "int32"
           }
         },
@@ -2011,8 +2112,26 @@
             "example": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
           },
           "statusId": {
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ],
             "type": "integer",
             "description": "Id of the status of the reservation. Possible values:\n1 = AwaitingClaim\n2 = Claimed\n3 = Cancelled\n4 = Expired",
+            "x-enum-varnames": [
+              "AwaitingClaim",
+              "Claimed",
+              "Cancelled",
+              "Expired"
+            ],
+            "x-enum-descriptions": [
+              "Stock has been allocated for the reservation.",
+              "The reservation was claimed and resulted into an order",
+              "The reservation was cancelled and any allocated stock was returned.",
+              "The reservation was not claimed or cancelled within the allowed time frame and is now expired."
+            ],
             "format": "int32"
           },
           "statusDescription": {

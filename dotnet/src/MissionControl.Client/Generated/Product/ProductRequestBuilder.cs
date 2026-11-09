@@ -162,7 +162,7 @@ namespace MissionControl.Client.Generated.Product
 #else
             public Guid?[] PublisherId { get; set; }
 #endif
-            /// <summary>Field to sort by</summary>
+            /// <summary>The field to sort the results on. Defaults to `name`.</summary>
             [Obsolete("This property is deprecated, use SortByAsGetSortByQueryParameterType instead")]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -173,10 +173,10 @@ namespace MissionControl.Client.Generated.Product
             [QueryParameter("sortBy")]
             public string SortBy { get; set; }
 #endif
-            /// <summary>Field to sort by</summary>
+            /// <summary>The field to sort the results on. Defaults to `name`.</summary>
             [QueryParameter("sortBy")]
             public global::MissionControl.Client.Generated.Product.GetSortByQueryParameterType? SortByAsGetSortByQueryParameterType { get; set; }
-            /// <summary>Direction to sort on</summary>
+            /// <summary>The direction to sort the results in. Defaults to `asc`.</summary>
             [Obsolete("This property is deprecated, use SortDirectionAsGetSortDirectionQueryParameterType instead")]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -187,7 +187,7 @@ namespace MissionControl.Client.Generated.Product
             [QueryParameter("sortDirection")]
             public string SortDirection { get; set; }
 #endif
-            /// <summary>Direction to sort on</summary>
+            /// <summary>The direction to sort the results in. Defaults to `asc`.</summary>
             [QueryParameter("sortDirection")]
             public global::MissionControl.Client.Generated.Product.GetSortDirectionQueryParameterType? SortDirectionAsGetSortDirectionQueryParameterType { get; set; }
         }

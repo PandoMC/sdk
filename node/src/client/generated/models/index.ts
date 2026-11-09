@@ -69,7 +69,7 @@ export interface ClaimReservationRequest extends Parsable {
     salesPrice?: SalesPriceRequest | null;
 }
 /**
- * The consumer who buys the key.
+ * The consumer who bought the key, i.e. a person.
  */
 export interface Consumer extends Parsable {
     /**

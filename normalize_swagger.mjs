@@ -110,16 +110,14 @@ for (const operations of Object.values(doc.paths)) {
   }
 }
 
-// 7. Sorting on GET /Product is applied by an attribute the OpenAPI generator doesn't see.
-const getProduct = doc.paths["/Product"]?.get;
-if (getProduct) {
-  getProduct.parameters ??= [];
-  const addQuery = (name, description, values) => {
-    if (getProduct.parameters.some((p) => p.name === name)) return;
-    getProduct.parameters.push({ name, in: "query", description, schema: { enum: values, type: "string" } });
-  };
-  addQuery("sortBy", "Field to sort by", ["name", "productTypeId", "releaseDate"]);
-  addQuery("sortDirection", "Direction to sort on", ["ASC", "DESC"]);
+// 7. Keep the sort directions of earlier SDK versions: asc/desc -> ASC/DESC. The API accepts either casing.
+for (const operations of Object.values(doc.paths)) {
+  for (const operation of Object.values(operations)) {
+    const schema = operation.parameters?.find((p) => p.name === "sortDirection")?.schema;
+    if (!schema) continue;
+    if (Array.isArray(schema.enum)) schema.enum = schema.enum.map((value) => String(value).toUpperCase());
+    if (typeof schema.default === "string") schema.default = schema.default.toUpperCase();
+  }
 }
 
 writeFileSync(file, JSON.stringify(doc, null, 2) + "\n", "utf8");
