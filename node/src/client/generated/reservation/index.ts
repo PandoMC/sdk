@@ -19,7 +19,7 @@ export interface ReservationRequestBuilder extends BaseRequestBuilder<Reservatio
      */
      byReservationId(reservationId: Guid) : WithReservationItemRequestBuilder;
     /**
-     * Creates a reservation that later can be redeemed to create an order.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
+     * Creates a reservation that later can be redeemed to create an order.Supply productId and countryCode (ISO 3166-1 alpha-2). GET Product returns the product's allowedCountries.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
      * @param body Request to send to create a reservation.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<Reservation>}
@@ -28,7 +28,7 @@ export interface ReservationRequestBuilder extends BaseRequestBuilder<Reservatio
      */
      post(body: CreateReservationRequest, requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<Reservation | undefined>;
     /**
-     * Creates a reservation that later can be redeemed to create an order.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
+     * Creates a reservation that later can be redeemed to create an order.Supply productId and countryCode (ISO 3166-1 alpha-2). GET Product returns the product's allowedCountries.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.Use this endpoint to temporarily reserve items before confirming them as an order.  The returned reservation can be redeemed using `POST /Order/claimReservation/{reservationId}`.
      * @param body Request to send to create a reservation.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}

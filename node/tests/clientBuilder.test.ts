@@ -151,4 +151,46 @@ describe("ClientBuilder", () => {
       expect(client).toBeDefined();
     });
   });
+
+  describe("assets", () => {
+    const publisherId = "3c9e8b7a-1d2f-4e5a-9b8c-7d6e5f4a3b21";
+    const productId = "80bd6d7b-cbe4-4279-af5f-fdaa16998e50";
+    const assetPacksUrl = (builder: ClientBuilder) =>
+      builder
+        .withAzureAdClientCredentials("fake-client-id", "fake-client-secret")
+        .build()
+        .assets.assetPack.byPublisherId(publisherId)
+        .byProductId(productId)
+        .toGetRequestInformation().URL;
+
+    it("uses the assets base URL of the environment", () => {
+      const builder = new ClientBuilder().forEnvironment(MissionControlEnvironment.Sandbox);
+      expect(assetPacksUrl(builder)).toBe(
+        `https://api.sandbox.missioncontrol.io/assets/partnerApi/v1/AssetPack/${publisherId}/${productId}`,
+      );
+    });
+
+    it("uses an overridden assets base URL", () => {
+      const builder = new ClientBuilder().withAssetsBaseUrl("http://localhost:5001/partnerApi/v1");
+      expect(assetPacksUrl(builder)).toBe(
+        `http://localhost:5001/partnerApi/v1/AssetPack/${publisherId}/${productId}`,
+      );
+    });
+
+    it("keeps the core API on its own base URL", () => {
+      const client = new ClientBuilder()
+        .forEnvironment(MissionControlEnvironment.Sandbox)
+        .withAzureAdClientCredentials("fake-client-id", "fake-client-secret")
+        .build();
+      expect(client.product.toGetRequestInformation().URL).toBe(
+        "https://api.sandbox.missioncontrol.io/partnerApi/v2/Product",
+      );
+    });
+
+    it("throws when assetsBaseUrl is whitespace only", () => {
+      expect(() => new ClientBuilder().withAssetsBaseUrl("  ")).toThrow(
+        "assetsBaseUrl must not be null or whitespace.",
+      );
+    });
+  });
 });

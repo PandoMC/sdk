@@ -8,7 +8,7 @@ using System;
 namespace MissionControl.Client.Generated.Models
 {
     /// <summary>
-    /// Browser information of the end consumer that placed the order
+    /// Browser information of the consumer that placed the order.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Browser : IParsable

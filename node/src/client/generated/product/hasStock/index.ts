@@ -11,7 +11,7 @@ import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type Requ
  */
 export interface HasStockRequestBuilder extends BaseRequestBuilder<HasStockRequestBuilder> {
     /**
-     * Checks if a product has stock.
+     * Supply productId and countryCode (ISO 3166-1 alpha-2). Mission:Control resolves an allowed region automatically.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.
      * @param body Request to send to check if a product has stock.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<HasStockResponse>}
@@ -20,7 +20,7 @@ export interface HasStockRequestBuilder extends BaseRequestBuilder<HasStockReque
      */
      post(body: HasStockRequest, requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<HasStockResponse | undefined>;
     /**
-     * Checks if a product has stock.
+     * Supply productId and countryCode (ISO 3166-1 alpha-2). Mission:Control resolves an allowed region automatically.For explicit region selection, supply regionId instead of countryCode. Supply exactly one of these fields.
      * @param body Request to send to check if a product has stock.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}

@@ -6,6 +6,8 @@ import { createProblemDetailsFromDiscriminatorValue, createProductListResultFrom
 // @ts-ignore
 import { HasStockRequestBuilderRequestsMetadata, type HasStockRequestBuilder } from './hasStock/index.js';
 // @ts-ignore
+import { type WithProductItemRequestBuilder, WithProductItemRequestBuilderNavigationMetadata } from './item/index.js';
+// @ts-ignore
 import { type BaseRequestBuilder, type Guid, type KeysToExcludeForNavigationMetadata, type NavigationMetadata, type Parsable, type ParsableFactory, type RequestConfiguration, type RequestInformation, type RequestsMetadata } from '@microsoft/kiota-abstractions';
 
 export type GetSortByQueryParameterType = (typeof GetSortByQueryParameterTypeObject)[keyof typeof GetSortByQueryParameterTypeObject];
@@ -19,7 +21,13 @@ export interface ProductRequestBuilder extends BaseRequestBuilder<ProductRequest
      */
     get hasStock(): HasStockRequestBuilder;
     /**
-     * Retrieves all products available.
+     * Gets an item from the missioncontrol.client.Product.item collection
+     * @param productId The product ID returned by GET Product.
+     * @returns {WithProductItemRequestBuilder}
+     */
+     byProductId(productId: Guid) : WithProductItemRequestBuilder;
+    /**
+     * Each product includes allowedCountries: the ISO 3166-1 alpha-2 country codes where your partner account may sell it.Use the product's id as productId and the consumer's country as countryCode when ordering, checking stock, or reserving a key.allowedRegions remains available for explicit region selection.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<ProductListResult>}
      * @throws {ProblemDetails} error when the service returns a 400 status code
@@ -27,14 +35,14 @@ export interface ProductRequestBuilder extends BaseRequestBuilder<ProductRequest
      */
      get(requestConfiguration?: RequestConfiguration<ProductRequestBuilderGetQueryParameters> | undefined) : Promise<ProductListResult | undefined>;
     /**
-     * Retrieves all products available.
+     * Each product includes allowedCountries: the ISO 3166-1 alpha-2 country codes where your partner account may sell it.Use the product's id as productId and the consumer's country as countryCode when ordering, checking stock, or reserving a key.allowedRegions remains available for explicit region selection.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
      toGetRequestInformation(requestConfiguration?: RequestConfiguration<ProductRequestBuilderGetQueryParameters> | undefined) : RequestInformation;
 }
 /**
- * Retrieves all products available.
+ * Each product includes allowedCountries: the ISO 3166-1 alpha-2 country codes where your partner account may sell it.Use the product's id as productId and the consumer's country as countryCode when ordering, checking stock, or reserving a key.allowedRegions remains available for explicit region selection.
  */
 export interface ProductRequestBuilderGetQueryParameters {
     /**
@@ -42,7 +50,7 @@ export interface ProductRequestBuilderGetQueryParameters {
      */
     countryCode?: string;
     /**
-     * Optional flag to include MSRP information in the response.When true and MissionControl.Application.Products.Dto.Partner.GetProductsRequest.CountryCode is provided, MSRP for the specified country will be included for each product if configured.This property is only effective when MissionControl.Application.Products.Dto.Partner.GetProductsRequest.CountryCode is also specified.Default is false.
+     * Optional flag to include MSRP information in the response.When true and string? GetProductsRequest.CountryCode is provided, MSRP for the specified country will be included for each product if configured.This property is only effective when string? GetProductsRequest.CountryCode is also specified.Default is false.
      */
     includeMsrp?: boolean;
     /**
@@ -60,11 +68,11 @@ export interface ProductRequestBuilderGetQueryParameters {
      */
     publisherId?: Guid[];
     /**
-     * Field to sort by
+     * The field to sort the results on. Defaults to `name`.
      */
     sortBy?: GetSortByQueryParameterType;
     /**
-     * Direction to sort on
+     * The direction to sort the results in. Defaults to `asc`.
      */
     sortDirection?: GetSortDirectionQueryParameterType;
 }
@@ -95,6 +103,10 @@ const ProductRequestBuilderGetQueryParametersMapper: Record<string, string> = {
  * Metadata for all the navigation properties in the request builder.
  */
 export const ProductRequestBuilderNavigationMetadata: Record<Exclude<keyof ProductRequestBuilder, KeysToExcludeForNavigationMetadata>, NavigationMetadata> = {
+    byProductId: {
+        navigationMetadata: WithProductItemRequestBuilderNavigationMetadata,
+        pathParametersMappings: ["productId"],
+    },
     hasStock: {
         requestsMetadata: HasStockRequestBuilderRequestsMetadata,
     },

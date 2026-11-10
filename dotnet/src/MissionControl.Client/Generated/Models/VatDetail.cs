@@ -8,12 +8,12 @@ using System;
 namespace MissionControl.Client.Generated.Models
 {
     /// <summary>
-    /// Represents the VAT (Value Added Tax) details associated with a sales price.The MissionControl.Application.Sales.Dto.Partner.VatDetail.Rate, MissionControl.Application.Sales.Dto.Partner.VatDetail.Amount, and MissionControl.Application.Sales.Dto.Partner.VatDetail.PriceExcludingVat properties are interdependent.When one of these properties is provided, the other two will be automatically calculated.Only one property should be set explicitly in any given request; setting more than one will result in a validation error.
+    /// VAT details of the sales price.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class VatDetail : IParsable
     {
-        /// <summary>Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.</summary>
+        /// <summary>The VAT amount, representing the monetary value of the VAT.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Money? Amount { get; set; }
@@ -21,7 +21,7 @@ namespace MissionControl.Client.Generated.Models
 #else
         public global::MissionControl.Client.Generated.Models.Money Amount { get; set; }
 #endif
-        /// <summary>Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.</summary>
+        /// <summary>The sales price before VAT is applied.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Money? PriceExcludingVat { get; set; }

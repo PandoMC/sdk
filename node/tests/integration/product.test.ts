@@ -27,4 +27,18 @@ describe.skipIf(!!missingCredentials)("Product API (integration)", () => {
     expect(typeof result?.totalCount).toBe("number");
     expect(typeof result?.pageCount).toBe("number");
   });
+
+  it("redemptionInstructions returns a list", async (context) => {
+    const client = createClient();
+
+    const products = await client.product.get();
+    const productId = products?.result?.[0]?.id;
+    if (!productId) context.skip("No products found in the configured environment.");
+
+    const instructions = await client.product.byProductId(productId!).redemptionInstructions.get();
+
+    // An empty list is valid: not every product has instructions assigned.
+    expect(Array.isArray(instructions)).toBe(true);
+    for (const instruction of instructions ?? []) expect(instruction.languageCode).toBeTruthy();
+  });
 });

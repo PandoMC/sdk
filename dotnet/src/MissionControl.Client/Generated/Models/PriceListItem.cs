@@ -21,7 +21,7 @@ namespace MissionControl.Client.Generated.Models
 #else
         public string CountryCode { get; set; }
 #endif
-        /// <summary>Represents a monetary value in a specified currency. This type encapsulates both the numeric value and thecurrency code, forming a complete monetary representation. It is typically used for handling prices,financial calculations, or currency-specific amounts. The Value and CurrencyCodeproperties must be provided for this type to have a meaningful monetary representation.</summary>
+        /// <summary>If set, Manufacturer’s Suggested Retailer Price in this country. If null, no MSRP is available.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Money? Msrp { get; set; }

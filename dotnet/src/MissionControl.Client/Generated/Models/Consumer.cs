@@ -8,12 +8,12 @@ using System;
 namespace MissionControl.Client.Generated.Models
 {
     /// <summary>
-    /// Represents the end consumer who buys a key.
+    /// The consumer who bought the key, i.e. a person.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Consumer : IParsable
     {
-        /// <summary>Browser information of the end consumer that placed the order</summary>
+        /// <summary>Browser information of the consumer that placed the order.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::MissionControl.Client.Generated.Models.Browser? Browser { get; set; }

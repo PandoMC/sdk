@@ -34,7 +34,7 @@ namespace MissionControl.Client.Generated.Order.CancelOrder
         {
         }
         /// <summary>
-        /// Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.            Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
+        /// Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
         /// </summary>
         /// <returns>A <see cref="global::MissionControl.Client.Generated.Models.Order"/></returns>
         /// <param name="body">Request to cancel an order.</param>
@@ -61,7 +61,7 @@ namespace MissionControl.Client.Generated.Order.CancelOrder
             return await RequestAdapter.SendAsync<global::MissionControl.Client.Generated.Models.Order>(requestInfo, global::MissionControl.Client.Generated.Models.Order.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.            Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
+        /// Typically only works very shortly after placing the order.Depending on the type of product, key supplier, time elapsed, etc. cancellation might not be possible, in which case the API will return an error.Use this API if there is an issue with the order right after placing it, for example:There was a client timeout.Your system failed to process the response from the Create Order endpoint.Mission Control returned a 5xx error.The order is identified by the original request ID that was provided when creating the order.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">Request to cancel an order.</param>

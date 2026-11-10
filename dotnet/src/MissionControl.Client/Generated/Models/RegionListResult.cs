@@ -13,17 +13,17 @@ namespace MissionControl.Client.Generated.Models
     #pragma warning restore CS1591
     {
         /// <summary>The pageCount property</summary>
-        public int? PageCount { get; private set; }
+        public int? PageCount { get; set; }
         /// <summary>The result property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::MissionControl.Client.Generated.Models.Region>? Result { get; private set; }
+        public List<global::MissionControl.Client.Generated.Models.Region>? Result { get; set; }
 #nullable restore
 #else
-        public List<global::MissionControl.Client.Generated.Models.Region> Result { get; private set; }
+        public List<global::MissionControl.Client.Generated.Models.Region> Result { get; set; }
 #endif
         /// <summary>The totalCount property</summary>
-        public int? TotalCount { get; private set; }
+        public int? TotalCount { get; set; }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
         /// </summary>
@@ -54,6 +54,9 @@ namespace MissionControl.Client.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteIntValue("pageCount", PageCount);
+            writer.WriteCollectionOfObjectValues<global::MissionControl.Client.Generated.Models.Region>("result", Result);
+            writer.WriteIntValue("totalCount", TotalCount);
         }
     }
 }

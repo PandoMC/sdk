@@ -1,5 +1,5 @@
 import { ClientBuilder } from "../../src/client/clientBuilder";
-import type { Client } from "../../src/client/generated/client";
+import type { MissionControlClient } from "../../src/client/clientBuilder";
 
 // Credentials are read from process.env, which Vitest populates from .env.local
 // (placed next to vitest.integration.config.ts, never committed).
@@ -31,13 +31,15 @@ export const missingCredentials: string =
 export const productId: string = process.env["MC_PRODUCT_ID"] ?? "";
 export const regionId: string = process.env["MC_REGION_ID"] ?? "";
 export const publisherId: string = process.env["MC_PUBLISHER_ID"] ?? "";
+/** Optional: asset tests are skipped when not set. */
+export const assetsBaseUrl: string = process.env["MC_ASSETS_BASE_URL"] ?? "";
 
 /**
  * Creates a fully configured integration-test client from the loaded credentials.
  * Only call this inside a test that is guarded by {@link missingCredentials}.
  */
-export function createClient(): Client {
-  return new ClientBuilder()
+export function createClient(): MissionControlClient {
+  const builder = new ClientBuilder()
     .withAzureAdClientCredentials(
       process.env["MC_CLIENT_ID"]!,
       process.env["MC_CLIENT_SECRET"]!,
@@ -45,6 +47,9 @@ export function createClient(): Client {
     )
     .withDefaultPartnerId(process.env["MC_PARTNER_ID"]!)
     .withBaseUrl(process.env["MC_BASE_URL"]!)
-    .withScope(process.env["MC_SCOPE"]!)
-    .build();
+    .withScope(process.env["MC_SCOPE"]!);
+
+  if (assetsBaseUrl) builder.withAssetsBaseUrl(assetsBaseUrl);
+
+  return builder.build();
 }

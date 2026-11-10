@@ -8,7 +8,7 @@ using System;
 namespace MissionControl.Client.Generated.Models
 {
     /// <summary>
-    /// An activation key for a product.
+    /// Key sold with this order.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class Key : IParsable

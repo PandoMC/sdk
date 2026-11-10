@@ -5,18 +5,32 @@ import {
   KiotaClientFactory,
 } from "@microsoft/kiota-http-fetchlibrary";
 import {
+  getAssetsBaseUrl,
   getBaseUrl,
   getScope,
   MissionControlEnvironment,
 } from "./missionControlEnvironment";
 import { createClient, type Client } from "./generated/client";
+import { createAssetsClient, type AssetsClient } from "./generatedAssets/assetsClient";
 import { createHandlers } from "./missionControlHandlers";
 
 /**
- * Fluent builder for creating a configured {@link Client} instance.
+ * The Mission:Control Partner API client.
+ */
+export type MissionControlClient = Client & {
+  /**
+   * The Assets API: asset packs (images, logos, etc.) publishers provide for their products.
+   * It is served by a separate service, so it has its own base URL but shares authentication and headers.
+   */
+  readonly assets: AssetsClient;
+};
+
+/**
+ * Fluent builder for creating a configured {@link MissionControlClient} instance.
  */
 export class ClientBuilder {
   private _baseUrl: string = getBaseUrl(MissionControlEnvironment.Production);
+  private _assetsBaseUrl: string = getAssetsBaseUrl(MissionControlEnvironment.Production);
   private _scope: string = getScope(MissionControlEnvironment.Production);
   private _tenantId: string = "13d084c1-d072-41f2-878b-c45ca721c9f6";
   private _clientId?: string;
@@ -54,6 +68,20 @@ export class ClientBuilder {
   }
 
   /**
+   * Overrides the base URL used for Assets API requests (`client.assets`).
+   * The Assets API is a separate service, so it is not affected by {@link withBaseUrl}.
+   * When combined with {@link forEnvironment}, the last call wins.
+   *
+   * @param assetsBaseUrl The base URL, e.g. `http://localhost:5001/partnerApi/v1`.
+   */
+  withAssetsBaseUrl(assetsBaseUrl: string): this {
+    if (!assetsBaseUrl?.trim())
+      throw new Error("assetsBaseUrl must not be null or whitespace.");
+    this._assetsBaseUrl = assetsBaseUrl;
+    return this;
+  }
+
+  /**
    * Overrides the OAuth scope used when acquiring tokens.
    * Useful when running against a local or custom environment whose app registration
    * differs from the well-known environments.
@@ -76,6 +104,7 @@ export class ClientBuilder {
    */
   forEnvironment(environment: MissionControlEnvironment): this {
     this._baseUrl = getBaseUrl(environment);
+    this._assetsBaseUrl = getAssetsBaseUrl(environment);
     this._scope = getScope(environment);
     return this;
   }
@@ -100,11 +129,11 @@ export class ClientBuilder {
   }
 
   /**
-   * Builds and returns the configured {@link Client}.
+   * Builds and returns the configured {@link MissionControlClient}.
    *
    * @throws {Error} When credentials have not been configured via {@link withAzureAdClientCredentials}.
    */
-  build(): Client {
+  build(): MissionControlClient {
     if (!this._clientId || !this._clientSecret) {
       throw new Error(
         "No credentials configured. " +
@@ -117,7 +146,10 @@ export class ClientBuilder {
       this._clientId,
       this._clientSecret,
     );
-    const allowedHosts = new Set([new URL(this._baseUrl).host]);
+    const allowedHosts = new Set([
+      new URL(this._baseUrl).host,
+      new URL(this._assetsBaseUrl).host,
+    ]);
     const authProvider = new AzureIdentityAuthenticationProvider(
       credential,
       [this._scope],
@@ -134,6 +166,21 @@ export class ClientBuilder {
       httpClient,
     );
     adapter.baseUrl = this._baseUrl;
-    return createClient(adapter);
+
+    // The Assets API is a separate service: same HTTP pipeline and credentials, different base URL.
+    const assetsAdapter = new FetchRequestAdapter(
+      authProvider,
+      undefined,
+      undefined,
+      httpClient,
+    );
+    assetsAdapter.baseUrl = this._assetsBaseUrl;
+    const assets = createAssetsClient(assetsAdapter);
+
+    // The generated client is a proxy, so expose assets through a wrapping proxy rather than mutating it.
+    return new Proxy(createClient(adapter), {
+      get: (target, property, receiver) =>
+        property === "assets" ? assets : Reflect.get(target, property, receiver),
+    }) as MissionControlClient;
   }
 }

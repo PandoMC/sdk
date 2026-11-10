@@ -93,6 +93,17 @@ var response = await client.Product.HasStock.PostAsync(new HasStockRequest
 Console.WriteLine(response!.HasStock == true ? "In stock" : "Out of stock");
 ```
 
+### Get redemption instructions
+
+Retrieve a product's redemption instructions (one entry per language) before placing an order.
+
+```csharp
+var instructions = await client.Product[productId].RedemptionInstructions.GetAsync();
+
+foreach (var instruction in instructions!)
+    Console.WriteLine($"{instruction.LanguageCode}: {instruction.Text}");
+```
+
 ### Reserve → claim (place an order)
 
 ```csharp
@@ -133,6 +144,23 @@ Console.WriteLine($"Order {order!.Id} placed.");
 await client.Reservation[reservation!.Id!.Value].Cancel.PostAsync();
 ```
 
+### Get asset packs
+
+Asset packs hold the images, logos and other marketing assets publishers provide for a product. They are served by the Assets API, available on `client.Assets`.
+
+```csharp
+var packs = await client.Assets.AssetPack[publisherId][productId].GetAsync();
+
+foreach (var pack in packs!.Result!)
+{
+    // Fetch a pack to get its assets.
+    var detail = await client.Assets.AssetPack[publisherId][productId][pack.Id].GetAsync();
+
+    foreach (var asset in detail!.Assets!)
+        Console.WriteLine($"{asset.FileName}  {asset.Url}");
+}
+```
+
 ### Filtering and pagination
 
 All list endpoints accept an optional query parameter lambda for filtering and pagination. Every parameter is optional — only set what you need.
@@ -167,6 +195,7 @@ var result = await client.Product.GetAsync(q =>
 | `WithDefaultPartnerId(partnerId)`                                 | Set the `X-Partner-Id` header for every request    |
 | `ForEnvironment(env)`                                             | Target `Sandbox` or `Production`                   |
 | `WithBaseUrl(url)`                                                | Override the base URL (e.g. for local development) |
+| `WithAssetsBaseUrl(url)`                                          | Override the base URL of the Assets API            |
 | `WithScope(scope)`                                                | Override the OAuth scope                           |
 | `Build()`                                                         | Return the configured `Client` instance            |
 

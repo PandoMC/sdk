@@ -14,7 +14,7 @@ namespace MissionControl.Client.Generated.Models
     public partial class Publisher : IParsable
     {
         /// <summary>Unique id of the publisher</summary>
-        public Guid? Id { get; private set; }
+        public Guid? Id { get; set; }
         /// <summary>Image of the Publisher</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -61,6 +61,7 @@ namespace MissionControl.Client.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteGuidValue("id", Id);
             writer.WriteStringValue("imageUrl", ImageUrl);
             writer.WriteStringValue("name", Name);
         }
