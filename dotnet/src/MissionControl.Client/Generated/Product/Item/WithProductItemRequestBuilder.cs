@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions;
+using MissionControl.Client.Generated.Product.Item.Attributes;
 using MissionControl.Client.Generated.Product.Item.RedemptionInstructions;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,11 @@ namespace MissionControl.Client.Generated.Product.Item
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class WithProductItemRequestBuilder : BaseRequestBuilder
     {
+        /// <summary>The attributes property</summary>
+        public global::MissionControl.Client.Generated.Product.Item.Attributes.AttributesRequestBuilder Attributes
+        {
+            get => new global::MissionControl.Client.Generated.Product.Item.Attributes.AttributesRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The redemptionInstructions property</summary>
         public global::MissionControl.Client.Generated.Product.Item.RedemptionInstructions.RedemptionInstructionsRequestBuilder RedemptionInstructions
         {
