@@ -789,6 +789,173 @@
         }
       }
     },
+    "/Product/{productId}/attributes": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Retrieves supplied attributes with every country scope, translation, and selection option.",
+        "description": "Only products in your partner catalog are available. Unsupplied definitions are omitted; an empty document returns an empty list.",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductAttributeDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductAttributeDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductAttributeDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Product/{productId}/attributes/resolved": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Resolves supplied attributes for a country and language.",
+        "description": "Omit countryCode to request global defaults only. Supply a catalog ISO alpha-2 country and a languageCode.\nExact country precedes global fallback; exact locale, culture parents, then English resolve text and labels independently.\nHasSource false means no applicable value. HasSource true with a null fact means a missing translation,\nwithout retrying the global value. CountryCode and LanguageCode identify the actual source.\nDefinitions with no stored value at any scope are omitted.",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "languageCode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "countryCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResolvedProductAttributeDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResolvedProductAttributeDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResolvedProductAttributeDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Product/hasStock": {
       "post": {
         "tags": [
@@ -1229,6 +1396,51 @@
           }
         },
         "description": "Represents the archiving status and metadata of an entity.",
+        "additionalProperties": false
+      },
+      "AttributeFactDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Plain nontranslated text."
+          },
+          "translations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "All exact translations, without fallback."
+          },
+          "number": {
+            "type": "number",
+            "description": "Decimal value; zero is supplied.",
+            "format": "double"
+          },
+          "boolean": {
+            "type": "boolean",
+            "description": "Boolean value; false is supplied."
+          },
+          "date": {
+            "type": "string",
+            "description": "Calendar date formatted as YYYY-MM-DD.",
+            "format": "date"
+          },
+          "optionId": {
+            "type": "string",
+            "description": "Single stable selection identity.",
+            "format": "uuid"
+          },
+          "optionIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Multiple stable selection identities."
+          }
+        },
+        "description": "A supplied fact with exactly one populated field matching the definition type.",
         "additionalProperties": false
       },
       "Browser": {
@@ -1952,6 +2164,146 @@
         "description": "A product for which activation keys are sold.",
         "additionalProperties": false
       },
+      "ProductAttributeDefinitionDto": {
+        "required": [
+          "id",
+          "valueType",
+          "labels",
+          "textIsTranslated",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable definition identity.",
+            "format": "uuid"
+          },
+          "publisherId": {
+            "type": "string",
+            "description": "Owner for a custom definition; null for a shared definition.",
+            "format": "uuid"
+          },
+          "valueType": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "type": "integer",
+            "description": "Underlying fact type.",
+            "x-enum-varnames": [
+              "Text",
+              "Number",
+              "Boolean",
+              "Date",
+              "SingleSelection",
+              "MultipleSelection"
+            ],
+            "x-enum-descriptions": [
+              "Plain or translated text.",
+              "A decimal number.",
+              "A boolean.",
+              "A calendar date.",
+              "One definition-owned selection option.",
+              "Several definition-owned selection options."
+            ],
+            "format": "int32"
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Exact language entries, without fallback."
+          },
+          "textIsTranslated": {
+            "type": "boolean",
+            "description": "Whether text values carry translations."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttributeOptionDto"
+            },
+            "description": "Ordered options with stable identities."
+          }
+        },
+        "description": "A reusable shared or publisher-owned descriptive definition.",
+        "additionalProperties": false
+      },
+      "ProductAttributeDto": {
+        "required": [
+          "definition",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "definition": {
+            "description": "Stable identity, ownership, type, labels, and selection options.",
+            "$ref": "#/components/schemas/ProductAttributeDefinitionDto"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttributeValueDto"
+            },
+            "description": "All supplied scopes; null country means global. No fallback is performed."
+          }
+        },
+        "description": "A supplied attribute with its definition and every stored country scope and translation.",
+        "additionalProperties": false
+      },
+      "ProductAttributeOptionDto": {
+        "required": [
+          "id",
+          "labels"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable option identity.",
+            "format": "uuid"
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Exact language entries, without fallback."
+          }
+        },
+        "description": "A definition-owned option with a stable identity and exact translated labels.",
+        "additionalProperties": false
+      },
+      "ProductAttributeValueDto": {
+        "required": [
+          "definitionId",
+          "fact"
+        ],
+        "type": "object",
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "description": "Stable definition identity.",
+            "format": "uuid"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Null for global; otherwise the country code."
+          },
+          "fact": {
+            "description": "Complete fact at this scope.",
+            "$ref": "#/components/schemas/AttributeFactDto"
+          }
+        },
+        "description": "One exact stored scope, including all translations without fallback.",
+        "additionalProperties": false
+      },
       "Publisher": {
         "type": "object",
         "properties": {
@@ -2147,6 +2499,126 @@
           }
         },
         "description": "Reservation for a product's key.",
+        "additionalProperties": false
+      },
+      "ResolvedAttributeTextDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Selected text, or null when no translation matches."
+          },
+          "languageCode": {
+            "type": "string",
+            "description": "Actual language of the text, or null when missing."
+          }
+        },
+        "description": "A label resolved by exact locale, culture parents, then English.",
+        "additionalProperties": false
+      },
+      "ResolvedProductAttributeDto": {
+        "required": [
+          "definitionId",
+          "valueType",
+          "textIsTranslated",
+          "label",
+          "options",
+          "hasSource"
+        ],
+        "type": "object",
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "description": "Stable definition identity, independent of labels.",
+            "format": "uuid"
+          },
+          "publisherId": {
+            "type": "string",
+            "description": "Custom definition owner, or null for shared definitions.",
+            "format": "uuid"
+          },
+          "valueType": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "type": "integer",
+            "description": "Underlying stored value type.",
+            "x-enum-varnames": [
+              "Text",
+              "Number",
+              "Boolean",
+              "Date",
+              "SingleSelection",
+              "MultipleSelection"
+            ],
+            "x-enum-descriptions": [
+              "Plain or translated text.",
+              "A decimal number.",
+              "A boolean.",
+              "A calendar date.",
+              "One definition-owned selection option.",
+              "Several definition-owned selection options."
+            ],
+            "format": "int32"
+          },
+          "textIsTranslated": {
+            "type": "boolean",
+            "description": "Whether stored text is translated."
+          },
+          "label": {
+            "description": "Resolved definition label and its actual language.",
+            "$ref": "#/components/schemas/ResolvedAttributeTextDto"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResolvedProductAttributeOptionDto"
+            },
+            "description": "Stable option identities with independently resolved labels, in definition order."
+          },
+          "hasSource": {
+            "type": "boolean",
+            "description": "False when neither the requested country nor global scope supplies a value."
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Actual source country; null for a global or absent source. Check HasSource to distinguish them."
+          },
+          "languageCode": {
+            "type": "string",
+            "description": "Actual text language; null for language-independent facts or missing translations."
+          },
+          "fact": {
+            "description": "Resolved fact; null with HasSource true means the selected fact has no matching translation.",
+            "$ref": "#/components/schemas/AttributeFactDto"
+          }
+        },
+        "description": "A supplied definition resolved for a requested country and language.",
+        "additionalProperties": false
+      },
+      "ResolvedProductAttributeOptionDto": {
+        "required": [
+          "id",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable definition-owned option identity.",
+            "format": "uuid"
+          },
+          "label": {
+            "description": "Independently resolved label and actual language.",
+            "$ref": "#/components/schemas/ResolvedAttributeTextDto"
+          }
+        },
+        "description": "A stable selection identity and its resolved label.",
         "additionalProperties": false
       },
       "SalesPriceRequest": {
