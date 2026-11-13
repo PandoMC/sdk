@@ -31,6 +31,14 @@ namespace MissionControl.Client.Generated.Models
 #endif
         /// <summary>Indicates whether keys for this product can be reserved. The reserve API can only be used for products where this is true.</summary>
         public bool? CanBeReserved { get; set; }
+        /// <summary>The family the product belongs to, if any: products that are versions of one product for the shopper,e.g. a gift card for PlayStation and Xbox. A shop can show the products of a family as one offer.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::MissionControl.Client.Generated.Models.ProductFamilyReference? Family { get; set; }
+#nullable restore
+#else
+        public global::MissionControl.Client.Generated.Models.ProductFamilyReference Family { get; set; }
+#endif
         /// <summary>Unique identifier.</summary>
         public Guid? Id { get; set; }
         /// <summary>Manufacturer&apos;s Suggested Retail Price (MSRP) for the product. This property is only populatedwhen bool GetProductsRequest.IncludeMsrp is provided and pricing information isavailable for the specified country. Returns null if no country code was provided or pricinginformation is unavailable.</summary>
@@ -96,6 +104,7 @@ namespace MissionControl.Client.Generated.Models
                 { "allowedCountries", n => { AllowedCountries = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "allowedRegions", n => { AllowedRegions = n.GetCollectionOfPrimitiveValues<Guid?>()?.AsList(); } },
                 { "canBeReserved", n => { CanBeReserved = n.GetBoolValue(); } },
+                { "family", n => { Family = n.GetObjectValue<global::MissionControl.Client.Generated.Models.ProductFamilyReference>(global::MissionControl.Client.Generated.Models.ProductFamilyReference.CreateFromDiscriminatorValue); } },
                 { "id", n => { Id = n.GetGuidValue(); } },
                 { "msrp", n => { Msrp = n.GetObjectValue<global::MissionControl.Client.Generated.Models.Money>(global::MissionControl.Client.Generated.Models.Money.CreateFromDiscriminatorValue); } },
                 { "name", n => { Name = n.GetStringValue(); } },
@@ -118,6 +127,7 @@ namespace MissionControl.Client.Generated.Models
             writer.WriteCollectionOfPrimitiveValues<string>("allowedCountries", AllowedCountries);
             writer.WriteCollectionOfPrimitiveValues<Guid?>("allowedRegions", AllowedRegions);
             writer.WriteBoolValue("canBeReserved", CanBeReserved);
+            writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.ProductFamilyReference>("family", Family);
             writer.WriteGuidValue("id", Id);
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.Money>("msrp", Msrp);
             writer.WriteStringValue("name", Name);

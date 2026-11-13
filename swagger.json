@@ -2159,6 +2159,10 @@
               "The value of the product is variable, e.g. a gift card where the caller can request a specific value to be assigned to the product."
             ],
             "format": "int32"
+          },
+          "family": {
+            "description": "The family the product belongs to, if any: products that are versions of one product for the shopper,\r\ne.g. a gift card for PlayStation and Xbox. A shop can show the products of a family as one offer.",
+            "$ref": "#/components/schemas/ProductFamilyReference"
           }
         },
         "description": "A product for which activation keys are sold.",
@@ -2801,6 +2805,26 @@
             "example": 1
           }
         },
+        "additionalProperties": false
+      },
+      "ProductFamilyReference": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the family.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the family, e.g. \"Gift card €15\"."
+          }
+        },
+        "description": "The family a product belongs to: products that are versions of one product for the shopper, e.g. a gift card\r\nfor PlayStation and Xbox. A shop can show the products of a family as one offer.",
         "additionalProperties": false
       }
     },

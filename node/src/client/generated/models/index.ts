@@ -427,6 +427,15 @@ export function createProductAttributeValueDtoFromDiscriminatorValue(parseNode: 
 /**
  * Creates a new instance of the appropriate class based on discriminator value
  * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {ProductFamilyReference}
+ */
+// @ts-ignore
+export function createProductFamilyReferenceFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoProductFamilyReference;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
  * @returns {Product}
  */
 // @ts-ignore
@@ -899,6 +908,7 @@ export function deserializeIntoProduct(product: Partial<Product> | undefined = {
         "allowedCountries": n => { product.allowedCountries = n.getCollectionOfPrimitiveValues<string>("string"); },
         "allowedRegions": n => { product.allowedRegions = n.getCollectionOfPrimitiveValues<Guid>("string"); },
         "canBeReserved": n => { product.canBeReserved = n.getBooleanValue(); },
+        "family": n => { product.family = n.getObjectValue<ProductFamilyReference>(createProductFamilyReferenceFromDiscriminatorValue); },
         "id": n => { product.id = n.getGuidValue(); },
         "msrp": n => { product.msrp = n.getObjectValue<Money>(createMoneyFromDiscriminatorValue); },
         "name": n => { product.name = n.getStringValue(); },
@@ -982,6 +992,18 @@ export function deserializeIntoProductAttributeValueDto(productAttributeValueDto
         "countryCode": n => { productAttributeValueDto.countryCode = n.getStringValue(); },
         "definitionId": n => { productAttributeValueDto.definitionId = n.getGuidValue(); },
         "fact": n => { productAttributeValueDto.fact = n.getObjectValue<AttributeFactDto>(createAttributeFactDtoFromDiscriminatorValue); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param ProductFamilyReference The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoProductFamilyReference(productFamilyReference: Partial<ProductFamilyReference> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "id": n => { productFamilyReference.id = n.getGuidValue(); },
+        "name": n => { productFamilyReference.name = n.getStringValue(); },
     }
 }
 /**
@@ -1416,6 +1438,10 @@ export interface Product extends Parsable {
      */
     canBeReserved?: boolean | null;
     /**
+     * The family the product belongs to, if any: products that are versions of one product for the shopper,e.g. a gift card for PlayStation and Xbox. A shop can show the products of a family as one offer.
+     */
+    family?: ProductFamilyReference | null;
+    /**
      * Unique identifier.
      */
     id?: Guid | null;
@@ -1537,6 +1563,19 @@ export interface ProductAttributeValueDto extends Parsable {
      * Complete fact at this scope.
      */
     fact?: AttributeFactDto | null;
+}
+/**
+ * The family the product belongs to, if any: products that are versions of one product for the shopper,e.g. a gift card for PlayStation and Xbox. A shop can show the products of a family as one offer.
+ */
+export interface ProductFamilyReference extends Parsable {
+    /**
+     * Unique identifier of the family.
+     */
+    id?: Guid | null;
+    /**
+     * Name of the family, e.g. "Gift card €15".
+     */
+    name?: string | null;
 }
 export interface ProductListResult extends Parsable {
     /**
@@ -2095,6 +2134,7 @@ export function serializeProduct(writer: SerializationWriter, product: Partial<P
     writer.writeCollectionOfPrimitiveValues<string>("allowedCountries", product.allowedCountries);
     writer.writeCollectionOfPrimitiveValues<Guid>("allowedRegions", product.allowedRegions);
     writer.writeBooleanValue("canBeReserved", product.canBeReserved);
+    writer.writeObjectValue<ProductFamilyReference>("family", product.family, serializeProductFamilyReference);
     writer.writeGuidValue("id", product.id);
     writer.writeObjectValue<Money>("msrp", product.msrp, serializeMoney);
     writer.writeStringValue("name", product.name);
@@ -2180,6 +2220,18 @@ export function serializeProductAttributeValueDto(writer: SerializationWriter, p
     writer.writeStringValue("countryCode", productAttributeValueDto.countryCode);
     writer.writeGuidValue("definitionId", productAttributeValueDto.definitionId);
     writer.writeObjectValue<AttributeFactDto>("fact", productAttributeValueDto.fact, serializeAttributeFactDto);
+}
+/**
+ * Serializes information the current object
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param ProductFamilyReference The instance to serialize from.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeProductFamilyReference(writer: SerializationWriter, productFamilyReference: Partial<ProductFamilyReference> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!productFamilyReference || isSerializingDerivedType) { return; }
+    writer.writeGuidValue("id", productFamilyReference.id);
+    writer.writeStringValue("name", productFamilyReference.name);
 }
 /**
  * Serializes information the current object
