@@ -930,6 +930,7 @@ export function deserializeIntoProduct(product: Partial<Product> | undefined = {
 export function deserializeIntoProductAttributeDefinitionDto(productAttributeDefinitionDto: Partial<ProductAttributeDefinitionDto> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
         "id": n => { productAttributeDefinitionDto.id = n.getGuidValue(); },
+        "key": n => { productAttributeDefinitionDto.key = n.getStringValue(); },
         "labels": n => { productAttributeDefinitionDto.labels = n.getObjectValue<ProductAttributeDefinitionDto_labels>(createProductAttributeDefinitionDto_labelsFromDiscriminatorValue); },
         "options": n => { productAttributeDefinitionDto.options = n.getCollectionOfObjectValues<ProductAttributeOptionDto>(createProductAttributeOptionDtoFromDiscriminatorValue); },
         "publisherId": n => { productAttributeDefinitionDto.publisherId = n.getGuidValue(); },
@@ -1140,6 +1141,7 @@ export function deserializeIntoResolvedProductAttributeDto(resolvedProductAttrib
         "definitionId": n => { resolvedProductAttributeDto.definitionId = n.getGuidValue(); },
         "fact": n => { resolvedProductAttributeDto.fact = n.getObjectValue<AttributeFactDto>(createAttributeFactDtoFromDiscriminatorValue); },
         "hasSource": n => { resolvedProductAttributeDto.hasSource = n.getBooleanValue(); },
+        "key": n => { resolvedProductAttributeDto.key = n.getStringValue(); },
         "label": n => { resolvedProductAttributeDto.label = n.getObjectValue<ResolvedAttributeTextDto>(createResolvedAttributeTextDtoFromDiscriminatorValue); },
         "languageCode": n => { resolvedProductAttributeDto.languageCode = n.getStringValue(); },
         "options": n => { resolvedProductAttributeDto.options = n.getCollectionOfObjectValues<ResolvedProductAttributeOptionDto>(createResolvedProductAttributeOptionDtoFromDiscriminatorValue); },
@@ -1491,6 +1493,10 @@ export interface ProductAttributeDefinitionDto extends Parsable {
      */
     id?: Guid | null;
     /**
+     * Unique name of a shared definition that is the same in every environment, e.g. <c>age-rating</c>; null when not set. Use it to recognise definitions with a known meaning instead of their environment-specific ID or translated labels.
+     */
+    key?: string | null;
+    /**
      * Exact language entries, without fallback.
      */
     labels?: ProductAttributeDefinitionDto_labels | null;
@@ -1761,6 +1767,10 @@ export interface ResolvedProductAttributeDto extends Parsable {
      * False when neither the requested country nor global scope supplies a value.
      */
     hasSource?: boolean | null;
+    /**
+     * Unique name of a shared definition that is the same in every environment, e.g. <c>age-rating</c>; null when not set.
+     */
+    key?: string | null;
     /**
      * Resolved definition label and its actual language.
      */
@@ -2156,6 +2166,7 @@ export function serializeProduct(writer: SerializationWriter, product: Partial<P
 export function serializeProductAttributeDefinitionDto(writer: SerializationWriter, productAttributeDefinitionDto: Partial<ProductAttributeDefinitionDto> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!productAttributeDefinitionDto || isSerializingDerivedType) { return; }
     writer.writeGuidValue("id", productAttributeDefinitionDto.id);
+    writer.writeStringValue("key", productAttributeDefinitionDto.key);
     writer.writeObjectValue<ProductAttributeDefinitionDto_labels>("labels", productAttributeDefinitionDto.labels, serializeProductAttributeDefinitionDto_labels);
     writer.writeCollectionOfObjectValues<ProductAttributeOptionDto>("options", productAttributeDefinitionDto.options, serializeProductAttributeOptionDto);
     writer.writeGuidValue("publisherId", productAttributeDefinitionDto.publisherId);
@@ -2368,6 +2379,7 @@ export function serializeResolvedProductAttributeDto(writer: SerializationWriter
     writer.writeGuidValue("definitionId", resolvedProductAttributeDto.definitionId);
     writer.writeObjectValue<AttributeFactDto>("fact", resolvedProductAttributeDto.fact, serializeAttributeFactDto);
     writer.writeBooleanValue("hasSource", resolvedProductAttributeDto.hasSource);
+    writer.writeStringValue("key", resolvedProductAttributeDto.key);
     writer.writeObjectValue<ResolvedAttributeTextDto>("label", resolvedProductAttributeDto.label, serializeResolvedAttributeTextDto);
     writer.writeStringValue("languageCode", resolvedProductAttributeDto.languageCode);
     writer.writeCollectionOfObjectValues<ResolvedProductAttributeOptionDto>("options", resolvedProductAttributeDto.options, serializeResolvedProductAttributeOptionDto);
