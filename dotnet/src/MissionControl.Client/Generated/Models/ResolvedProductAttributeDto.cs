@@ -33,6 +33,14 @@ namespace MissionControl.Client.Generated.Models
 #endif
         /// <summary>False when neither the requested country nor global scope supplies a value.</summary>
         public bool? HasSource { get; set; }
+        /// <summary>Unique name of a shared definition that is the same in every environment, e.g. &lt;c&gt;age-rating&lt;/c&gt;; null when not set.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? Key { get; set; }
+#nullable restore
+#else
+        public string Key { get; set; }
+#endif
         /// <summary>Resolved definition label and its actual language.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -85,6 +93,7 @@ namespace MissionControl.Client.Generated.Models
                 { "definitionId", n => { DefinitionId = n.GetGuidValue(); } },
                 { "fact", n => { Fact = n.GetObjectValue<global::MissionControl.Client.Generated.Models.AttributeFactDto>(global::MissionControl.Client.Generated.Models.AttributeFactDto.CreateFromDiscriminatorValue); } },
                 { "hasSource", n => { HasSource = n.GetBoolValue(); } },
+                { "key", n => { Key = n.GetStringValue(); } },
                 { "label", n => { Label = n.GetObjectValue<global::MissionControl.Client.Generated.Models.ResolvedAttributeTextDto>(global::MissionControl.Client.Generated.Models.ResolvedAttributeTextDto.CreateFromDiscriminatorValue); } },
                 { "languageCode", n => { LanguageCode = n.GetStringValue(); } },
                 { "options", n => { Options = n.GetCollectionOfObjectValues<global::MissionControl.Client.Generated.Models.ResolvedProductAttributeOptionDto>(global::MissionControl.Client.Generated.Models.ResolvedProductAttributeOptionDto.CreateFromDiscriminatorValue)?.AsList(); } },
@@ -104,6 +113,7 @@ namespace MissionControl.Client.Generated.Models
             writer.WriteGuidValue("definitionId", DefinitionId);
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.AttributeFactDto>("fact", Fact);
             writer.WriteBoolValue("hasSource", HasSource);
+            writer.WriteStringValue("key", Key);
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.ResolvedAttributeTextDto>("label", Label);
             writer.WriteStringValue("languageCode", LanguageCode);
             writer.WriteCollectionOfObjectValues<global::MissionControl.Client.Generated.Models.ResolvedProductAttributeOptionDto>("options", Options);

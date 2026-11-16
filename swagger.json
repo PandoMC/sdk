@@ -2188,6 +2188,10 @@
             "description": "Owner for a custom definition; null for a shared definition.",
             "format": "uuid"
           },
+          "key": {
+            "type": "string",
+            "description": "Unique name of a shared definition that is the same in every environment, e.g. <c>age-rating</c>; null when not set. Use it to recognise definitions with a known meaning instead of their environment-specific ID or translated labels."
+          },
           "valueType": {
             "enum": [
               1,
@@ -2540,6 +2544,10 @@
             "type": "string",
             "description": "Custom definition owner, or null for shared definitions.",
             "format": "uuid"
+          },
+          "key": {
+            "type": "string",
+            "description": "Unique name of a shared definition that is the same in every environment, e.g. <c>age-rating</c>; null when not set."
           },
           "valueType": {
             "enum": [

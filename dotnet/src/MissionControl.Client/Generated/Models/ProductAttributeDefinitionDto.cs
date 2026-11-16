@@ -15,6 +15,14 @@ namespace MissionControl.Client.Generated.Models
     {
         /// <summary>Stable definition identity.</summary>
         public Guid? Id { get; set; }
+        /// <summary>Unique name of a shared definition that is the same in every environment, e.g. &lt;c&gt;age-rating&lt;/c&gt;; null when not set. Use it to recognise definitions with a known meaning instead of their environment-specific ID or translated labels.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? Key { get; set; }
+#nullable restore
+#else
+        public string Key { get; set; }
+#endif
         /// <summary>Exact language entries, without fallback.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -56,6 +64,7 @@ namespace MissionControl.Client.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "id", n => { Id = n.GetGuidValue(); } },
+                { "key", n => { Key = n.GetStringValue(); } },
                 { "labels", n => { Labels = n.GetObjectValue<global::MissionControl.Client.Generated.Models.ProductAttributeDefinitionDto_labels>(global::MissionControl.Client.Generated.Models.ProductAttributeDefinitionDto_labels.CreateFromDiscriminatorValue); } },
                 { "options", n => { Options = n.GetCollectionOfObjectValues<global::MissionControl.Client.Generated.Models.ProductAttributeOptionDto>(global::MissionControl.Client.Generated.Models.ProductAttributeOptionDto.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "publisherId", n => { PublisherId = n.GetGuidValue(); } },
@@ -71,6 +80,7 @@ namespace MissionControl.Client.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteGuidValue("id", Id);
+            writer.WriteStringValue("key", Key);
             writer.WriteObjectValue<global::MissionControl.Client.Generated.Models.ProductAttributeDefinitionDto_labels>("labels", Labels);
             writer.WriteCollectionOfObjectValues<global::MissionControl.Client.Generated.Models.ProductAttributeOptionDto>("options", Options);
             writer.WriteGuidValue("publisherId", PublisherId);
